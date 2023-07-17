@@ -49,12 +49,12 @@ export const authSlice = createSlice({
             state.token = null;
             HTTP.defaults.headers.common['Authorization'] = `Bearer `;
         },
+        setStatus: (state, action: PayloadAction<Status>) => {
+            state.status = action.payload;
+        }
     },
     extraReducers(builder) {
         builder
-            .addCase(login.pending, (state) => {
-                state.status = "loading";
-            })
             .addCase(
                 login.fulfilled,
                 (state, action: PayloadAction<string>) => {
@@ -65,9 +65,6 @@ export const authSlice = createSlice({
             )
             .addCase(login.rejected, (state) => {
                 state.status = "failed";
-            })
-            .addCase(getUserInfo.pending, (state) => {
-                state.status = "loading";
             })
             .addCase(
                 getUserInfo.fulfilled,
@@ -82,6 +79,6 @@ export const authSlice = createSlice({
     }
 })
 
-export const {logout, resetToken} = authSlice.actions
+export const {logout, resetToken, setStatus} = authSlice.actions
 
 export default authSlice.reducer

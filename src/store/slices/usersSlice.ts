@@ -5,33 +5,25 @@ import {Status} from "../../types/status.type.ts";
 import {createAppAsyncThunk} from "../types.ts";
 import {AxiosError, isAxiosError} from "axios";
 import {resetToken} from "./authSlice.ts";
+import {User} from "../../types/user.type.ts";
 
-export interface OrganizationsState {
-    organizations: Organization[];
+export interface UsersState {
+    users: User[];
     status: Status;
-    categories: string[],
-    categoriesStatus: Status,
-    currentCategory: string,
 }
 
-const initialState: OrganizationsState = {
-    organizations: [],
+const initialState: UsersState = {
+    users: [],
     status: "idle",
-    categories: [],
-    categoriesStatus: "idle",
-    currentCategory: "Все"
 }
 
-export const getOrganizations = createAppAsyncThunk(
-    "organizations/getOrganizations",
+export const getUsers = createAppAsyncThunk(
+    "users/getUsers",
     async (_, {getState, dispatch, rejectWithValue}) => {
         const state = getState();
         try {
-            const response = await api.organizations.getList(state.organizations.currentCategory);
-            return response.map(org => ({
-                ...org,
-                icon: import.meta.env.VITE_API_URL + "/" + org.icon
-            }));
+            const response = await api.users.getList();
+            return response;
         } catch (e) {
             if (isAxiosError(e)) {
                 if (e.response?.status === 401) {
@@ -47,13 +39,10 @@ export const getOrganizations = createAppAsyncThunk(
     }
 );
 
-export const organizationsSlice = createSlice({
-    name: 'organizations',
+export const usersSlice = createSlice({
+    name: 'users',
     initialState,
     reducers: {
-        setCategory: (state, action: PayloadAction<string>) => {
-            state.currentCategory = action.payload;
-        },
         setStatus: (state, action: PayloadAction<Status>) => {
             state.status = action.payload;
         }
@@ -61,18 +50,18 @@ export const organizationsSlice = createSlice({
     extraReducers(builder) {
         builder
             .addCase(
-                getOrganizations.fulfilled,
-                (state, action: PayloadAction<Organization[]>) => {
+                getUsers.fulfilled,
+                (state, action: PayloadAction<User[]>) => {
                     state.status = "succeeded";
-                    state.organizations = action.payload;
+                    state.users = action.payload;
                 }
             )
-            .addCase(getOrganizations.rejected, (state) => {
+            .addCase(getUsers.rejected, (state) => {
                 state.status = "failed";
             })
     }
 })
 
-export const {setCategory, setStatus} = organizationsSlice.actions;
+export const {setStatus} = usersSlice.actions;
 
-export default organizationsSlice.reducer
+export default usersSlice.reducer

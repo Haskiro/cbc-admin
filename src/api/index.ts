@@ -1,6 +1,7 @@
 import axios from "axios";
-import auth from "./auth.ts"
-import organizations from "./organizations.ts";
+import auth from "./auth"
+import organizations from "./organizations";
+import users from "./users"
 
 export const HTTP = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
@@ -11,5 +12,6 @@ export const HTTP = axios.create({
 
 export default {
     auth,
-    organizations
+    organizations,
+    users
 }

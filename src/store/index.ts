@@ -1,5 +1,6 @@
 import authReducer from "./slices/authSlice.ts";
-import organizationsReduce from "./slices/organizationsSlice.ts";
+import organizationsReducer from "./slices/organizationsSlice.ts";
+import usersReducer from "./slices/usersSlice.ts";
 import {configureStore, combineReducers} from "@reduxjs/toolkit";
 import {
     persistStore,
@@ -28,7 +29,8 @@ const authPersistConfig = {
 
 const rootReducer = combineReducers({
     auth: persistReducer(authPersistConfig, authReducer),
-    organizations: organizationsReduce
+    organizations: organizationsReducer,
+    users: usersReducer
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

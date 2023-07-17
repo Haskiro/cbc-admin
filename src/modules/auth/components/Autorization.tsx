@@ -1,9 +1,7 @@
 import {useForm, SubmitHandler} from "react-hook-form";
 import {useNavigate} from "react-router-dom";
-import {Link} from "react-router-dom";
-import {FormEvent, useEffect} from "react";
+import {useEffect} from "react";
 import {login} from "../../../store/slices/authSlice.ts";
-import {HTTP} from "../../../api";
 import {useAppDispatch, useAppSelector} from "../../../store/types.ts";
 
 interface AuthTypes {
@@ -41,7 +39,7 @@ const Autorization = () => {
                     <input
                         type="text"
                         className="pl-[20px] w-[400px] h-[45px] rounded-[10px] bg-[#2B292E] outline-none h1-13-400"
-                        placeholder="test123@gmail.com"
+                        placeholder="example@gmail.com"
                         {...register('email', {
                             required: "Введите Email",
                             pattern: {

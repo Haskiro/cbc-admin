@@ -4,6 +4,7 @@ import Auth from "./pages/Auth"
 import MainLayout from "./pages/MainLayout.tsx"
 import Organizations from "./pages/Organizations.tsx";
 import Profile from "./pages/Profile.tsx";
+import Users from "./pages/Users.tsx";
 function App() {
 
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<MainLayout/>}>
           <Route index element={<Organizations />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="users" element={<Users />} />
         </Route>
     </Routes>
     </BrowserRouter>

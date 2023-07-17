@@ -34,6 +34,15 @@ const NavBar = () => {
                     >
                         Организации
                     </NavLink>
+                    <NavLink
+                        to="/users"
+                        className={({isActive}) => {
+                            const commonClass = "items-center cursor-pointer h1-18-400 px-4 py-1";
+                            return isActive ? "bg-[#2847A2]  " + commonClass : commonClass;
+                        }}
+                    >
+                        Пользователи
+                    </NavLink>
                 </div>
             </div>
             <div>
