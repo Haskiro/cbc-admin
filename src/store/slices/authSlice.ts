@@ -1,8 +1,9 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
+import type {PayloadAction} from '@reduxjs/toolkit'
 import {User} from "../../types/user.type.ts";
 import {LoginData} from "../../api/auth.ts";
 import api from "../../api"
+import {RootState} from "../index.ts";
 
 export interface AuthState {
     user: User | null;
@@ -20,6 +21,14 @@ export const login = createAsyncThunk(
     "auth/login",
     async (loginData: LoginData) => {
         const response = await api.auth.loginUser(loginData);
+        return response;
+    }
+);
+
+export const getUserInfo = createAsyncThunk(
+    "auth/getUserInfo",
+    async () => {
+        const response = await api.auth.getCurrentUserInfo();
         return response;
     }
 );
@@ -52,9 +61,22 @@ export const authSlice = createSlice({
             .addCase(login.rejected, (state) => {
                 state.status = "failed";
             })
+            .addCase(getUserInfo.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(
+                getUserInfo.fulfilled,
+                (state, action: PayloadAction<User>) => {
+                    state.status = "succeeded";
+                    state.user = action.payload;
+                }
+            )
+            .addCase(getUserInfo.rejected, (state) => {
+                state.status = "failed";
+            })
     }
 })
 
-export const { logout } = authSlice.actions
+export const {logout} = authSlice.actions
 
 export default authSlice.reducer
