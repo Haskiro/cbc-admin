@@ -1,29 +1,23 @@
-import React, {FunctionComponent, useState} from 'react';
+import React, {FC, useState} from 'react';
 import cl from './Modal.module.css'
 import classNames from 'classnames';
+import {Organization, OrganizationNew} from "../../../../types/organization.type.ts";
 
-interface OwnProps {
+export type ModalProps = {
   isActive: boolean
   onClose: () => void,
   createPost: any,
-  postList: Post[]
+  postList: Organization[]
 }
 
-interface Post {
-  name: string,
-  adress: string,
-  image: any,
-  description: string
-}
-
-const Modal: FunctionComponent<OwnProps> = ({isActive, onClose, createPost, postList}) => {
-  const [newPost, createNewPost] = useState<Post>({
-    name: '', description: '', image: '', adress: ''
+const Modal: FC<ModalProps> = ({isActive, onClose, createPost, postList}) => {
+  const [newPost, createNewPost] = useState<Partial<OrganizationNew>>({
+    title: '', description: '', icon: '', address: ''
   })
 
   const submit = () => {
     createPost([...postList, newPost])
-    createNewPost({name: '', image: '', adress: '', description: ''})
+    createNewPost({title: '', icon: '', address: '', description: ''})
     onClose()
   }
 
@@ -46,8 +40,8 @@ const Modal: FunctionComponent<OwnProps> = ({isActive, onClose, createPost, post
           <input
             type="text"
             className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-blue-400'
-            value={newPost.name}
-            onChange={(e) => createNewPost({...newPost, name: e.target.value})}
+            value={newPost.title}
+            onChange={(e) => createNewPost({...newPost, title: e.target.value})}
           />
           <label>Описание</label>
           <input
@@ -63,11 +57,11 @@ const Modal: FunctionComponent<OwnProps> = ({isActive, onClose, createPost, post
             onChange={(e) => {
               if (e.target.files) {
                 const file = e.target.files[0]
-                let reader = new FileReader()
+                const reader = new FileReader()
 
                 reader.readAsDataURL(file)
                 reader.onload = () => {
-                  createNewPost({...newPost, image: reader.result})
+                  createNewPost({...newPost, icon: reader.result})
                 }
               }
 
@@ -77,8 +71,8 @@ const Modal: FunctionComponent<OwnProps> = ({isActive, onClose, createPost, post
           <input
             type="text"
             className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-blue-400'
-            value={newPost.adress}
-            onChange={(e) => createNewPost({...newPost, adress: e.target.value})}
+            value={newPost.address}
+            onChange={(e) => createNewPost({...newPost, address: e.target.value})}
           />
           <button className='w-full bg-blue-400 rounded-md text-white py-2 mt-4'>Создать</button>
         </form>

@@ -1,24 +1,19 @@
-import  {FunctionComponent, useState} from 'react';
+import {FC, useEffect, useState} from 'react';
 import Modal from "../modules/main/components/modal/Modal.tsx";
 import NavBar from '../components/navbar/NavBar.tsx';
+import {Organization} from "../types/organization.type.ts";
+import {useAppSelector} from "../store";
+import {useNavigate} from "react-router-dom";
 
-interface OwnProps {
-}
-
-interface Post {
-  name: string,
-  description: string,
-  image: any,
-  adress: any
-}
-
-type Props = OwnProps;
-
-const Main: FunctionComponent<Props> = (props) => {
-
+const Main: FC = () => {
+  const token = useAppSelector((state) => state.auth.token);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-  const [postList, addPost] = useState<Post[]>([
+  const [postList, addPost] = useState<Organization[]>([
   ])
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (!token) navigate('/');
+  }, [token])
 
   const closeModal = () => setIsModalOpen(false)
 
@@ -42,12 +37,12 @@ const Main: FunctionComponent<Props> = (props) => {
           </div>
           <div className='flex w-full flex-wrap px-4 py-4 '>
             {
-              postList.map((post: Post) =>
+              postList.map((post: Organization) =>
                 <div className='h-[450px] w-[350px] border-1 border-gray-600 border rounded-md mx-4 mb-4 p-2 flex-col justify-between items-start flex' key={postList.indexOf(post)} >
-                  <img src={post.image} alt="" className='h-[200px] w-full object-cover mb-4 rounded-md' />
-                  <h1 className='h1-22-400 !text-blue-400 mb-4 w-full break-words'>{post.name}</h1>
+                  <img src={post.icon} alt="" className='h-[200px] w-full object-cover mb-4 rounded-md' />
+                  <h1 className='h1-22-400 !text-blue-400 mb-4 w-full break-words'>{post.title}</h1>
                   <p className='text-[18px] h1-18-400 mb-4 w-full'>{post.description}</p>
-                  <p className='text-[16px] h1-16-400 mb-4 w-full'>{post.adress}</p>
+                  <p className='text-[16px] h1-16-400 mb-4 w-full'>{post.address}</p>
                   <button className='bg-red-500 rounded-[12px] w-full py-2 ' onClick={() => addPost([...postList.filter((e) => postList.indexOf(e) !== postList.indexOf(post))]) }><p className='h1-16-400'>Удалить</p></button>
                 </div>
               )

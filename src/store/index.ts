@@ -21,14 +21,14 @@ const persistConfig = {
     whitelist: [],
 };
 
-const userPersistConfig = {
+const authPersistConfig = {
     key: "auth",
     storage,
     blacklist: ["status", "user"],
 };
 
 const rootReducer = combineReducers({
-    user: persistReducer(userPersistConfig, authReducer)
+    auth: persistReducer(authPersistConfig, authReducer)
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

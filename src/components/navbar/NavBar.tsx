@@ -1,9 +1,11 @@
-import { useNavigate } from "react-router-dom"
 import house from './static/house.svg'
+import {useAppDispatch} from "../../store";
+import {logout} from "../../store/slices/authSlice.ts";
+
 const NavBar = () => {
-    const navigate = useNavigate()
-    const logout = () =>{
-        navigate("/")
+    const dispatch = useAppDispatch();
+    const handleLogout = () => {
+        dispatch(logout());
     }
 
   return (
@@ -24,7 +26,7 @@ const NavBar = () => {
             </div>
         </div>
         <div>
-            <button className="w-[200px] h-[35px] rounded-[10px] h1-16-400 bg-[#2847A2] hover:bg-[#233D8B]" onClick={logout}>Выйти</button>
+            <button className="w-[200px] h-[35px] rounded-[10px] h1-16-400 bg-[#2847A2] hover:bg-[#233D8B]" onClick={handleLogout}>Выйти</button>
         </div>
     </div>
   )

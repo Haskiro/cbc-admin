@@ -8,7 +8,6 @@ export type LoginData = {
 }
 const loginUser = async (loginData: LoginData): Promise<string> => {
     const res: AxiosResponse<{ token: string }> = await HTTP.post("/auth/login", loginData);
-    HTTP.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
     return res.data.token;
 }
 

@@ -11,3 +11,7 @@ export type Organization = {
     longitude: number,
     offers?: Offer[]
 }
+
+export type OrganizationNew = Omit<Organization, "icon"> & {
+    icon: string | ArrayBuffer | null;
+}

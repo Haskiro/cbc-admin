@@ -2,8 +2,8 @@ import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
 import type {PayloadAction} from '@reduxjs/toolkit'
 import {User} from "../../types/user.type.ts";
 import {LoginData} from "../../api/auth.ts";
-import api from "../../api"
-import {RootState} from "../index.ts";
+import api, {HTTP} from "../../api"
+import {RootState, useAppDispatch} from "../index.ts";
 
 export interface AuthState {
     user: User | null;
@@ -38,13 +38,15 @@ export const authSlice = createSlice({
     initialState,
     reducers: {
         logout: (state) => {
-            state.token = "";
             state.user = null;
             state.status = "idle";
+            state.token = "";
+            HTTP.defaults.headers.common['Authorization'] = `Bearer `;
         },
-        // incrementByAmount: (state, action: PayloadAction<number>) => {
-        //     state.value += action.payload
-        // },
+        resetToken: (state) => {
+            state.token = "";
+            HTTP.defaults.headers.common['Authorization'] = `Bearer `;
+        },
     },
     extraReducers(builder) {
         builder
@@ -56,6 +58,7 @@ export const authSlice = createSlice({
                 (state, action: PayloadAction<string>) => {
                     state.status = "succeeded";
                     state.token = action.payload;
+                    HTTP.defaults.headers.common['Authorization'] = `Bearer ${action.payload}`;
                 }
             )
             .addCase(login.rejected, (state) => {
@@ -77,6 +80,6 @@ export const authSlice = createSlice({
     }
 })
 
-export const {logout} = authSlice.actions
+export const {logout, resetToken} = authSlice.actions
 
 export default authSlice.reducer
