@@ -20,7 +20,7 @@ const Autorization = () => {
     const status = useAppSelector((state) => state.auth.status);
 
     useEffect(() => {
-        if (token) navigate("/main");
+        if (token) navigate("/");
     }, [token]);
 
     const onSubmit: SubmitHandler<AuthTypes> = async (data) => {

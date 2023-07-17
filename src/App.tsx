@@ -1,14 +1,18 @@
 import { BrowserRouter } from "react-router-dom"
 import {Routes, Route} from "react-router-dom"
 import Auth from "./pages/Auth"
-import Main from "./pages/Main"
+import MainLayout from "./pages/MainLayout.tsx"
+import Organizations from "./pages/Organizations.tsx";
 function App() {
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Auth/>}></Route>
-        <Route path="/main" element={<Main/>}></Route>
+        <Route path="/auth" element={<Auth/>} />
+        <Route path="/" element={<MainLayout/>}>
+          <Route index element={<Organizations />} />
+          <Route path="profile" element={<>Profile</>} />
+        </Route>
     </Routes>
     </BrowserRouter>
   )

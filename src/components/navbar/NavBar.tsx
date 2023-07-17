@@ -21,7 +21,7 @@ const NavBar = () => {
                 </div>
                 <div className="flex flex-row justify-start items-center mt-[20px] cursor-pointer">
                     <img src={house} alt="icon" className="w-[25px] h-[25px] mr-[10px]"/>
-                    <h1 className="h1-18-400">Пользоваетели</h1>
+                    <h1 className="h1-18-400">Пользователи</h1>
                 </div>
             </div>
         </div>
