@@ -1,6 +1,6 @@
 import AuthForm from "../modules/auth/AuthForm"
 
-const Autn = () => {
+const Auth = () => {
   return (
     <div className="main__container">
       <AuthForm/>
@@ -8,4 +8,4 @@ const Autn = () => {
   )
 }
 
-export default Autn
+export default Auth
