@@ -1,6 +1,6 @@
 import house from './static/house.svg'
-import {useAppDispatch} from "../../store";
 import {logout} from "../../store/slices/authSlice.ts";
+import {useAppDispatch} from "../../store/types.ts";
 
 const NavBar = () => {
     const dispatch = useAppDispatch();

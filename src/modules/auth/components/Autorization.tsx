@@ -1,10 +1,10 @@
 import {useForm, SubmitHandler} from "react-hook-form";
 import {useNavigate} from "react-router-dom";
 import {Link} from "react-router-dom";
-import {useAppDispatch, useAppSelector} from "../../../store";
 import {FormEvent, useEffect} from "react";
 import {login} from "../../../store/slices/authSlice.ts";
 import {HTTP} from "../../../api";
+import {useAppDispatch, useAppSelector} from "../../../store/types.ts";
 
 interface AuthTypes {
     email: string,

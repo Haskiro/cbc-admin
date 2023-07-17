@@ -1,7 +1,6 @@
-import { useDispatch, useSelector } from "react-redux";
-import type { TypedUseSelectorHook } from "react-redux";
-import authReducer from "./slices/authSlice.ts"
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import authReducer from "./slices/authSlice.ts";
+import organizationsReduce from "./slices/organizationsSlice.ts";
+import {configureStore, combineReducers} from "@reduxjs/toolkit";
 import {
     persistStore,
     persistReducer,
@@ -28,7 +27,8 @@ const authPersistConfig = {
 };
 
 const rootReducer = combineReducers({
-    auth: persistReducer(authPersistConfig, authReducer)
+    auth: persistReducer(authPersistConfig, authReducer),
+    organizations: organizationsReduce
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -51,11 +51,9 @@ export const store = configureStore({
         }),
 })
 
-export let persistor = persistStore(store);
+export const persistor = persistStore(store);
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch
-export const useAppDispatch: () => AppDispatch = useDispatch;
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

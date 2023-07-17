@@ -3,21 +3,22 @@ import type {PayloadAction} from '@reduxjs/toolkit'
 import {User} from "../../types/user.type.ts";
 import {LoginData} from "../../api/auth.ts";
 import api, {HTTP} from "../../api"
-import {RootState, useAppDispatch} from "../index.ts";
+import {Status} from "../../types/status.type.ts";
+import {createAppAsyncThunk} from "../types.ts";
 
 export interface AuthState {
     user: User | null;
-    token: string;
-    status: "idle" | "loading" | "succeeded" | "failed"
+    token: string | null;
+    status: Status;
 }
 
 const initialState: AuthState = {
     user: null,
-    token: "",
+    token: null,
     status: "idle"
 }
 
-export const login = createAsyncThunk(
+export const login = createAppAsyncThunk(
     "auth/login",
     async (loginData: LoginData) => {
         const response = await api.auth.loginUser(loginData);
@@ -25,7 +26,7 @@ export const login = createAsyncThunk(
     }
 );
 
-export const getUserInfo = createAsyncThunk(
+export const getUserInfo = createAppAsyncThunk(
     "auth/getUserInfo",
     async () => {
         const response = await api.auth.getCurrentUserInfo();
@@ -38,13 +39,15 @@ export const authSlice = createSlice({
     initialState,
     reducers: {
         logout: (state) => {
+            console.log(state.token);
             state.user = null;
             state.status = "idle";
-            state.token = "";
+            // state.token = "";
             HTTP.defaults.headers.common['Authorization'] = `Bearer `;
         },
         resetToken: (state) => {
-            state.token = "";
+            // state.token = null;
+            // console.log(state.token);
             HTTP.defaults.headers.common['Authorization'] = `Bearer `;
         },
     },
