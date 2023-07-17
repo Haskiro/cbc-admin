@@ -42,12 +42,11 @@ export const authSlice = createSlice({
             console.log(state.token);
             state.user = null;
             state.status = "idle";
-            // state.token = "";
+            state.token = null;
             HTTP.defaults.headers.common['Authorization'] = `Bearer `;
         },
         resetToken: (state) => {
-            // state.token = null;
-            // console.log(state.token);
+            state.token = null;
             HTTP.defaults.headers.common['Authorization'] = `Bearer `;
         },
     },

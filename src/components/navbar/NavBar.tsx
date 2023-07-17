@@ -1,6 +1,7 @@
 import house from './static/house.svg'
 import {logout} from "../../store/slices/authSlice.ts";
 import {useAppDispatch} from "../../store/types.ts";
+import {NavLink} from "react-router-dom";
 
 const NavBar = () => {
     const dispatch = useAppDispatch();
@@ -8,28 +9,40 @@ const NavBar = () => {
         dispatch(logout());
     }
 
-  return (
-    <div className="h-[100vh] w-[250px] flex flex-col justify-between items-center bg-[#212021] pt-[20px] pb-[35px]">
-        <div className="flex flex-col justify-start items-start w-full">
-            <div className="flex w-full justify-center items-center mb-[50px]">
-                <h1 className="h1-30-400">LOGO</h1>
+    return (
+        <div className="h-[100vh] w-[250px] flex flex-col justify-between items-center bg-[#212021] pt-[20px] pb-[35px]">
+            <div className="flex flex-col justify-start items-start w-full">
+                <div className="flex w-full justify-center items-center mb-[50px]">
+                    <h1 className="h1-30-400">LOGO</h1>
+                </div>
+                <div className="flex flex-col w-full">
+                    <NavLink
+                        to="/profile"
+                        className={({isActive}) => {
+                            const commonClass = "items-center cursor-pointer h1-18-400 px-4 py-1";
+                            return isActive ? "bg-[#2847A2]  " + commonClass : commonClass;
+                        }}
+                    >
+                        Профиль
+                    </NavLink>
+                    <NavLink
+                        to="/"
+                        className={({isActive}) => {
+                            const commonClass = "items-center cursor-pointer h1-18-400 px-4 py-1";
+                            return isActive ? "bg-[#2847A2]  " + commonClass : commonClass;
+                        }}
+                    >
+                        Организации
+                    </NavLink>
+                </div>
             </div>
-            <div className="flex flex-col pl-[15px]">
-                <div className="flex flex-row justify-start items-center cursor-pointer">
-                    <img src={house} alt="icon" className="w-[25px] h-[25px] mr-[10px]"/>
-                    <h1 className="h1-18-400">Организации</h1>
-                </div>
-                <div className="flex flex-row justify-start items-center mt-[20px] cursor-pointer">
-                    <img src={house} alt="icon" className="w-[25px] h-[25px] mr-[10px]"/>
-                    <h1 className="h1-18-400">Пользователи</h1>
-                </div>
+            <div>
+                <button className="w-[200px] h-[35px] rounded-[10px] h1-16-400 bg-red-500"
+                        onClick={handleLogout}>Выйти
+                </button>
             </div>
         </div>
-        <div>
-            <button className="w-[200px] h-[35px] rounded-[10px] h1-16-400 bg-[#2847A2] hover:bg-[#233D8B]" onClick={handleLogout}>Выйти</button>
-        </div>
-    </div>
-  )
+    )
 }
 
 export default NavBar
