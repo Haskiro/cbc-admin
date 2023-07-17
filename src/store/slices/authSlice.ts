@@ -1,46 +1,60 @@
-import { createSlice } from '@reduxjs/toolkit'
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import {User} from "../../types/user.type.ts";
+import {LoginData} from "../../api/auth.ts";
+import api from "../../api"
 
 export interface AuthState {
     user: User | null;
     token: string;
-    authStatus: "idle" | "loading" | "succeeded" | "failed"
+    status: "idle" | "loading" | "succeeded" | "failed"
 }
 
 const initialState: AuthState = {
     user: null,
     token: "",
-    authStatus: "idle"
+    status: "idle"
 }
+
+export const login = createAsyncThunk(
+    "auth/login",
+    async (loginData: LoginData) => {
+        const response = await api.auth.loginUser(loginData);
+        return response;
+    }
+);
 
 export const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
+        logout: (state) => {
+            state.token = "";
+            state.user = null;
+            state.status = "idle";
+        },
         // incrementByAmount: (state, action: PayloadAction<number>) => {
         //     state.value += action.payload
         // },
     },
-    // extraReducers(builder) {
-    //     builder
-    //         .addCase(login.pending, (state) => {
-    //             state.authStatus = "loading";
-    //         })
-    //         .addCase(
-    //             login.fulfilled,
-    //             (state, action: PayloadAction<IAccessToken>) => {
-    //                 state.authStatus = "succeeded";
-    //                 state.accessToken = action.payload.access;
-    //             }
-    //         )
-    //         .addCase(login.rejected, (state) => {
-    //             state.authStatus = "failed";
-    //         })
-    // }
+    extraReducers(builder) {
+        builder
+            .addCase(login.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(
+                login.fulfilled,
+                (state, action: PayloadAction<string>) => {
+                    state.status = "succeeded";
+                    state.token = action.payload;
+                }
+            )
+            .addCase(login.rejected, (state) => {
+                state.status = "failed";
+            })
+    }
 })
 
-// Action creators are generated for each case reducer function
-// export const { increment, decrement, incrementByAmount } = counterSlice.actions
-//
-// export default counterSlice.reducer
+export const { logout } = authSlice.actions
+
+export default authSlice.reducer
