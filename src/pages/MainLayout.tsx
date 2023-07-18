@@ -26,7 +26,7 @@ const MainLayout: FC = () => {
 
   return (
     <section>
-      <div className='w-full max-h-[100vh] flex flex-row ml-auto mr-10 bg-[#19181C]'>
+      <div className='w-full max-h-[100vh] flex flex-row ml-auto mr-10 bg-[#19181C] relative'>
         <NavBar/>
         <div className="overflow-y-auto w-full">
           <Outlet />
