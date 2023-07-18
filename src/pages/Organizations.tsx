@@ -1,10 +1,11 @@
 import {FC, useEffect, useState} from "react";
 import {Organization} from "../types/organization.type.ts";
-import Modal from "../modules/main/components/modal/Modal.tsx";
+import Modal from "../components/modal/Modal.tsx";
 import {deleteOrg, deleteOrganization, getOrganizations, setStatus} from "../store/slices/organizationsSlice.ts";
 import {useAppDispatch, useAppSelector} from "../store/types.ts";
 import {ellipsisLongText} from "../utils/ellipsisLongText.ts";
 import {withTimeout} from "../utils/withTimeout.ts";
+import OrganizationForm from "../modules/main/components/OrganizationForm.tsx";
 
 const Organizations: FC = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -26,7 +27,7 @@ const Organizations: FC = () => {
 
     return (
         <>
-            <Modal isActive={isModalOpen}
+            <OrganizationForm isActive={isModalOpen}
                    onClose={closeModal} />
             <div className='w-full flex flex-col p-4'>
                 <div className='w-full bg-[#19181C] flex justify-between'>

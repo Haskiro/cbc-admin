@@ -1,6 +1,6 @@
 import {FC, useEffect, useState} from "react";
 import {Organization} from "../types/organization.type.ts";
-import Modal from "../modules/main/components/modal/Modal.tsx";
+import Modal from "../components/modal/Modal.tsx";
 import {useAppDispatch, useAppSelector} from "../store/types.ts";
 import {ellipsisLongText} from "../utils/ellipsisLongText.ts";
 import {withTimeout} from "../utils/withTimeout.ts";

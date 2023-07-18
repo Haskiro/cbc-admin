@@ -1,15 +1,16 @@
-import React, {FC} from "react";
+import React, {FC, useRef} from "react";
 import usePlacesAutocomplete, {getGeocode, getLatLng} from "use-places-autocomplete";
-import {UseFormRegister} from "react-hook-form";
+import {UseFormRegister, UseFormSetValue} from "react-hook-form";
 import {OrganizationNew} from "../../../../types/organization.type.ts";
-import {Location} from "../modal/Modal.tsx";
+import {Location} from "../../../../components/modal/Modal.tsx";
 
 export type PlaceAutocompleteProps = {
     onSelected: (location: Location) => void,
-    register: UseFormRegister<OrganizationNew>
+    register: UseFormRegister<OrganizationNew>,
+    setFieldValue: UseFormSetValue<OrganizationNew>
 }
 
-const PlacesAutocomplete: FC<PlaceAutocompleteProps> = ({onSelected, register}) => {
+const PlacesAutocomplete: FC<PlaceAutocompleteProps> = ({onSelected, register, setFieldValue}) => {
     const {
         ready,
         value,
@@ -18,31 +19,46 @@ const PlacesAutocomplete: FC<PlaceAutocompleteProps> = ({onSelected, register}) 
         clearSuggestions,
     } = usePlacesAutocomplete();
 
+    const inputRef = useRef<HTMLInputElement>(null)
+
     const handleSelect = async (address: string) => {
         setValue(address, false);
         clearSuggestions();
 
         const results = await getGeocode({address});
-        const {lng, lat} = await getLatLng(results[0]);
-        onSelected({
-            latitude: lat,
-            longitude: lng
-        });
+        try {
+            const {lng, lat} = await getLatLng(results[0]);
+            console.log(lat, lng)
+            onSelected({
+                latitude: lat,
+                longitude: lng
+            });
+            setFieldValue("address", address);
+
+        } catch (e) {
+            console.log("0 search results")
+        }
     };
 
     return (<>
         <label>Адрес</label>
         <input
-            type="text"
             className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-blue-400'
             placeholder="Город, улица, дом..."
             disabled={!ready}
             value={value}
+            onChange={(e) => {
+                setValue(e.target.value)
+                setFieldValue("address", "");
+            }}
+        />
+        <input
             {...register('address', {
-                required: "Укажите адрес"
+                required: "Укажите адрес(выберите из списка)"
             })}
-            onChange={(e) => setValue(e.target.value)}
-            // onBlur={() => clearSuggestions()}
+            type="text"
+            ref={inputRef}
+            className="absolute h-0 w-0 hidden"
         />
         {status === "OK" &&
             <div
