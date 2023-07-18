@@ -1,10 +1,11 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
+import {createSlice} from '@reduxjs/toolkit'
 import type {PayloadAction} from '@reduxjs/toolkit'
 import {User} from "../../types/user.type.ts";
 import {LoginData} from "../../api/auth.ts";
 import api, {HTTP} from "../../api"
 import {Status} from "../../types/status.type.ts";
 import {createAppAsyncThunk} from "../types.ts";
+import {isAxiosError} from "axios";
 
 export interface AuthState {
     user: User | null;
@@ -28,9 +29,22 @@ export const login = createAppAsyncThunk(
 
 export const getUserInfo = createAppAsyncThunk(
     "auth/getUserInfo",
-    async () => {
-        const response = await api.auth.getCurrentUserInfo();
-        return response;
+    async (_, {dispatch, rejectWithValue}) => {
+        try {
+            const response = await api.auth.getCurrentUserInfo();
+            return response;
+        } catch (e) {
+            if (isAxiosError(e)) {
+                if (e.response?.status === 401) {
+                    dispatch(resetToken());
+                    return rejectWithValue("Ошибка авторизации")
+                } else {
+                    return rejectWithValue(e.message)
+                }
+            } else {
+                throw e;
+            }
+        }
     }
 );
 

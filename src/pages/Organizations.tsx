@@ -22,9 +22,7 @@ const Organizations: FC = () => {
     return (
         <>
             <Modal isActive={isModalOpen}
-                   onClose={closeModal}
-                   createPost={() => console.log("post created")}
-                   postList={organizations}/>
+                   onClose={closeModal} />
             <div className='w-full flex flex-col p-4'>
                 <div className='w-full bg-[#19181C] flex justify-between'>
                     <p className='h1-35-400'>Список организаций</p>

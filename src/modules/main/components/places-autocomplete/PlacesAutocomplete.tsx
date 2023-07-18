@@ -2,13 +2,14 @@ import React, {FC} from "react";
 import usePlacesAutocomplete, {getGeocode, getLatLng} from "use-places-autocomplete";
 import {UseFormRegister} from "react-hook-form";
 import {OrganizationNew} from "../../../../types/organization.type.ts";
+import {Location} from "../modal/Modal.tsx";
 
 export type PlaceAutocompleteProps = {
-    onSelected: any,
+    onSelected: (location: Location) => void,
     register: UseFormRegister<OrganizationNew>
 }
 
-const PlacesAutocomplete: FC<PlaceAutocompleteProps> = (onSelected, register) => {
+const PlacesAutocomplete: FC<PlaceAutocompleteProps> = ({onSelected, register}) => {
     const {
         ready,
         value,
@@ -22,8 +23,11 @@ const PlacesAutocomplete: FC<PlaceAutocompleteProps> = (onSelected, register) =>
         clearSuggestions();
 
         const results = await getGeocode({address});
-        const {lat, lng} = await getLatLng(results[0]);
-        console.log({lat, lng});
+        const {lng, lat} = await getLatLng(results[0]);
+        onSelected({
+            latitude: lat,
+            longitude: lng
+        });
     };
 
     return (<>
@@ -34,16 +38,20 @@ const PlacesAutocomplete: FC<PlaceAutocompleteProps> = (onSelected, register) =>
             placeholder="Город, улица, дом..."
             disabled={!ready}
             value={value}
+            {...register('address', {
+                required: "Укажите адрес"
+            })}
             onChange={(e) => setValue(e.target.value)}
+            // onBlur={() => clearSuggestions()}
         />
         {status === "OK" &&
             <div
                 className="w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-blue-400">
                 {data.map(({place_id, description}) => (
-                    <option className="cursor-pointer"
+                    <option className="cursor-pointer hover:opacity-50"
                             value={description}
                             key={place_id}
-                            onClick={(description) => handleSelect}>{description}</option>
+                            onClick={() => handleSelect(description)}>{description}</option>
                 ))}
             </div>}
     </>)

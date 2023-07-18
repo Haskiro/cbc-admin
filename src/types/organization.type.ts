@@ -13,5 +13,5 @@ export type Organization = {
 }
 
 export type OrganizationNew = Omit<Organization, "icon"> & {
-    icon: string | ArrayBuffer | null;
+    icon: FileList;
 }

@@ -1,37 +1,55 @@
-import React, {FC, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import cl from './Modal.module.css'
 import classNames from 'classnames';
 import {Organization, OrganizationNew} from "../../../../types/organization.type.ts";
 import {SubmitHandler, useForm} from "react-hook-form";
 import {useLoadScript} from "@react-google-maps/api";
-import usePlacesAutocomplete, {
-    getGeocode,
-    getLatLng,
-} from "use-places-autocomplete";
+import {Library} from "@googlemaps/js-api-loader";
 import PlacesAutocomplete from "../places-autocomplete/PlacesAutocomplete.tsx";
+import {useAppDispatch, useAppSelector} from "../../../../store/types.ts";
+import {createOrganization, setCreateOrgStatus} from "../../../../store/slices/organizationsSlice.ts";
+import {withTimeout} from "../../../../utils/withTimeout.ts";
 
 export type ModalProps = {
     isActive: boolean
     onClose: () => void,
-    createPost: any,
-    postList: Organization[]
 }
 
-const Modal: FC<ModalProps> = ({isActive, onClose, createPost, postList}) => {
+export type Location = {
+    latitude: number,
+    longitude: number
+}
+
+const libraries = ["places"]
+const Modal: FC<ModalProps> = ({isActive, onClose}) => {
         const {register, handleSubmit, formState: {errors}, reset} = useForm<OrganizationNew>();
         const {isLoaded} = useLoadScript({
             googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_KEY,
-            libraries: ["places"],
+            libraries: libraries as Library[],
         });
-        const [address, setAddress] = useState<string>("");
+        const createOrgStatus = useAppSelector((state) => state.organizations.createOrgStatus);
+        const dispatch = useAppDispatch();
+        const [address, setAddress] = useState<Location | null>(null);
 
         const onSubmit: SubmitHandler<OrganizationNew> = async (data) => {
-            try {
-                // await dispatch(login(data)).unwrap();
-                console.log(data);
-            } catch (err) {
-                console.error(err);
-            }
+            dispatch(setCreateOrgStatus("loading"))
+            withTimeout(async () => {
+                try {
+                    console.log({
+                        ...data,
+                        icon: data.icon![0],
+                        ...address
+                    })
+                    await dispatch(createOrganization({
+                        ...data,
+                        icon: data.icon![0],
+                        ...address
+                    })).unwrap()
+                    onClose();
+                } catch (e) {
+                    return e;
+                }
+            })
         };
 
         return (
@@ -83,12 +101,24 @@ const Modal: FC<ModalProps> = ({isActive, onClose, createPost, postList}) => {
                                 {errors?.icon && (
                                     <div className="h1-11-400 !text-[#FE0826]">{errors.icon.message}</div>
                                 )}
-                                <PlacesAutocomplete register={register} onSelected={setAddress} />
+                                <PlacesAutocomplete register={register}
+                                                    onSelected={(location: Location) => setAddress(location)}/>
                                 {errors?.address && (
                                     <div className="h1-11-400 !text-[#FE0826]">{errors.address.message}</div>
                                 )}
+                                <label>Категория</label>
+                                <input
+                                    type="text"
+                                    className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-blue-400'
+                                    {...register('category', {
+                                        required: "Введите категорию"
+                                    })}
+                                />
+                                {errors?.category && (
+                                    <div className="h1-11-400 !text-[#FE0826]">{errors.category.message}</div>
+                                )}
                                 <button type="submit"
-                                        className='w-full bg-blue-400 rounded-md text-white py-2 mt-4'>Создать
+                                        className='w-full bg-blue-400 rounded-md text-white py-2 mt-4'>{createOrgStatus === "loading" ? "Загрузка..." : "Создать"}
                                 </button>
                             </form>
                         </div>
