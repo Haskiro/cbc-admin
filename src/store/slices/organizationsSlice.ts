@@ -10,6 +10,7 @@ export interface OrganizationsState {
     organizations: Organization[];
     status: Status;
     createOrgStatus: Status;
+    deleteOrgStatus: Status;
     error: string | null,
     categories: string[],
     categoriesStatus: Status,
@@ -20,6 +21,7 @@ const initialState: OrganizationsState = {
     organizations: [],
     status: "idle",
     createOrgStatus: "idle",
+    deleteOrgStatus: "idle",
     error: null,
     categories: [],
     categoriesStatus: "idle",
@@ -75,6 +77,30 @@ export const createOrganization = createAppAsyncThunk(
     }
 );
 
+export const deleteOrganization = createAppAsyncThunk(
+    "organizations/deleteOrganization",
+    async (id: string, {dispatch, rejectWithValue}) => {
+        try {
+            const response = await api.organizations.deleteOrganization(id);
+            if (response.ok) {
+                dispatch(deleteOrg(id));
+            }
+        } catch (e) {
+            if (isAxiosError(e)) {
+                if (e.response?.status === 401) {
+                    dispatch(resetToken());
+                    return rejectWithValue("Ошибка авторизации")
+                } else {
+                    console.log(e.response)
+                    return rejectWithValue(e.message)
+                }
+            } else {
+                throw e;
+            }
+        }
+    }
+);
+
 export const organizationsSlice = createSlice({
     name: 'organizations',
     initialState,
@@ -87,6 +113,9 @@ export const organizationsSlice = createSlice({
         },
         setCreateOrgStatus: (state, action: PayloadAction<Status>) => {
             state.createOrgStatus = action.payload;
+        },
+        deleteOrg: (state, action: PayloadAction<string>) => {
+            state.organizations.splice(state.organizations.findIndex(el => el.id === action.payload), 1);
         }
     },
     extraReducers(builder) {
@@ -106,16 +135,35 @@ export const organizationsSlice = createSlice({
                 createOrganization.fulfilled,
                 (state, action: PayloadAction<Organization>) => {
                     state.createOrgStatus = "succeeded";
-                    state.organizations.push(action.payload);
+                    state.organizations.push({
+                        ...action.payload,
+                        icon: import.meta.env.VITE_API_URL + "/" + action.payload.icon
+                    });
                 }
             )
             .addCase(createOrganization.rejected, (state, action) => {
                 state.createOrgStatus = "failed";
                 state.error = action.payload || null;
             })
+            .addCase(
+                deleteOrganization.pending,
+                (state) => {
+                    state.deleteOrgStatus = "loading";
+                }
+            )
+            .addCase(
+                deleteOrganization.fulfilled,
+                (state) => {
+                    state.deleteOrgStatus = "succeeded";
+                }
+            )
+            .addCase(deleteOrganization.rejected, (state, action) => {
+                state.deleteOrgStatus = "failed";
+                state.error = action.payload || null;
+            })
     }
 })
 
-export const {setCategory, setStatus, setCreateOrgStatus} = organizationsSlice.actions;
+export const {setCategory, setStatus, setCreateOrgStatus, deleteOrg} = organizationsSlice.actions;
 
 export default organizationsSlice.reducer

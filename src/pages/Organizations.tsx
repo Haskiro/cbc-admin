@@ -1,7 +1,7 @@
 import {FC, useEffect, useState} from "react";
 import {Organization} from "../types/organization.type.ts";
 import Modal from "../modules/main/components/modal/Modal.tsx";
-import {getOrganizations, setStatus} from "../store/slices/organizationsSlice.ts";
+import {deleteOrg, deleteOrganization, getOrganizations, setStatus} from "../store/slices/organizationsSlice.ts";
 import {useAppDispatch, useAppSelector} from "../store/types.ts";
 import {ellipsisLongText} from "../utils/ellipsisLongText.ts";
 import {withTimeout} from "../utils/withTimeout.ts";
@@ -12,7 +12,12 @@ const Organizations: FC = () => {
     const organizations = useAppSelector((state) => state.organizations.organizations);
     const status = useAppSelector((state) => state.organizations.status);
     const currentCategory = useAppSelector(state => state.organizations.currentCategory);
+    const deleteOrgStatus = useAppSelector((state) => state.organizations.deleteOrgStatus);
     const closeModal = () => setIsModalOpen(false)
+
+    const handleDeleteOrg = async (id: string) => {
+        await dispatch(deleteOrganization(id));
+    }
 
     useEffect(() => {
         dispatch(setStatus("loading"));
@@ -57,9 +62,11 @@ const Organizations: FC = () => {
                                 )}</p>
                                 <p className='text-[16px] h1-16-400 mb-4 w-full'
                                    title={organization.address}>{ellipsisLongText(organization.address, 40)}</p>
-                                <button className='bg-red-500 rounded-[12px] w-full py-2 '
-                                        onClick={() => console.log("organization deleted: " + organization.id)}><p
-                                    className='h1-16-400'>Удалить</p></button>
+                                <button className='bg-red-500 rounded-[12px] w-full py-2 disabled:opacity-75'
+                                        onClick={() => handleDeleteOrg(organization.id)}
+                                        disabled={deleteOrgStatus === "loading"}
+                                ><p
+                                    className='h1-16-400'>{deleteOrgStatus === "loading" ? "Удаление..." : "Удалить"}</p></button>
                             </div>
                         )
                         : null}

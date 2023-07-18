@@ -32,8 +32,9 @@ const createOrganization = async (newOrg: Omit<OrganizationNew, "icon"> & {
     return res.data;
 }
 
-const deleteOrganization = async (id: string): Promise<void> => {
-    await HTTP.delete("/organizations/delete", {data: {id}});
+const deleteOrganization = async (id: string): Promise<{ ok: boolean }> => {
+    const res: AxiosResponse<{ok: boolean}> = await HTTP.delete("/organizations/delete", {data: {id}});
+    return res.data;
 }
 
 

@@ -35,11 +35,6 @@ const Modal: FC<ModalProps> = ({isActive, onClose}) => {
             dispatch(setCreateOrgStatus("loading"))
             withTimeout(async () => {
                 try {
-                    console.log({
-                        ...data,
-                        icon: data.icon![0],
-                        ...address
-                    })
                     await dispatch(createOrganization({
                         ...data,
                         icon: data.icon![0],
@@ -118,7 +113,8 @@ const Modal: FC<ModalProps> = ({isActive, onClose}) => {
                                     <div className="h1-11-400 !text-[#FE0826]">{errors.category.message}</div>
                                 )}
                                 <button type="submit"
-                                        className='w-full bg-blue-400 rounded-md text-white py-2 mt-4'>{createOrgStatus === "loading" ? "Загрузка..." : "Создать"}
+                                        disabled={createOrgStatus === "loading"}
+                                        className='w-full bg-blue-400 rounded-md text-white py-2 mt-4 disabled: opacity-75'>{createOrgStatus === "loading" ? "Создание..." : "Создать"}
                                 </button>
                             </form>
                         </div>
