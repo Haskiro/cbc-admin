@@ -32,24 +32,11 @@ export const getOrganizations = createAppAsyncThunk(
     "organizations/getOrganizations",
     async (_, {getState, dispatch, rejectWithValue}) => {
         const state = getState();
-        try {
-            const response = await api.organizations.getList(state.organizations.currentCategory);
-            return response.map(org => ({
-                ...org,
-                icon: import.meta.env.VITE_API_URL + "/" + org.icon
-            }));
-        } catch (e) {
-            if (isAxiosError(e)) {
-                if (e.response?.status === 401) {
-                    dispatch(resetToken());
-                    return rejectWithValue("Ошибка авторизации")
-                } else {
-                    return rejectWithValue(e.message)
-                }
-            } else {
-                throw e;
-            }
-        }
+        const response = await api.organizations.getList(state.organizations.currentCategory);
+        return response.map(org => ({
+            ...org,
+            icon: import.meta.env.VITE_API_URL + "/" + org.icon
+        }));
     }
 );
 
@@ -58,45 +45,17 @@ export const createOrganization = createAppAsyncThunk(
     async (newOrg: Omit<OrganizationNew, "icon"> & {
         icon: File;
     }, {dispatch, rejectWithValue}) => {
-        try {
-            const response = await api.organizations.createOrganization(newOrg);
-            return response;
-        } catch (e) {
-            if (isAxiosError(e)) {
-                if (e.response?.status === 401) {
-                    dispatch(resetToken());
-                    return rejectWithValue("Ошибка авторизации")
-                } else {
-                    console.log(e.response)
-                    return rejectWithValue(e.message)
-                }
-            } else {
-                throw e;
-            }
-        }
+        const response = await api.organizations.createOrganization(newOrg);
+        return response;
     }
 );
 
 export const deleteOrganization = createAppAsyncThunk(
     "organizations/deleteOrganization",
     async (id: string, {dispatch, rejectWithValue}) => {
-        try {
-            const response = await api.organizations.deleteOrganization(id);
-            if (response.ok) {
-                dispatch(deleteOrg(id));
-            }
-        } catch (e) {
-            if (isAxiosError(e)) {
-                if (e.response?.status === 401) {
-                    dispatch(resetToken());
-                    return rejectWithValue("Ошибка авторизации")
-                } else {
-                    console.log(e.response)
-                    return rejectWithValue(e.message)
-                }
-            } else {
-                throw e;
-            }
+        const response = await api.organizations.deleteOrganization(id);
+        if (response.ok) {
+            dispatch(deleteOrg(id));
         }
     }
 );

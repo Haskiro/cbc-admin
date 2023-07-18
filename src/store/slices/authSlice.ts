@@ -30,21 +30,8 @@ export const login = createAppAsyncThunk(
 export const getUserInfo = createAppAsyncThunk(
     "auth/getUserInfo",
     async (_, {dispatch, rejectWithValue}) => {
-        try {
-            const response = await api.auth.getCurrentUserInfo();
-            return response;
-        } catch (e) {
-            if (isAxiosError(e)) {
-                if (e.response?.status === 401) {
-                    dispatch(resetToken());
-                    return rejectWithValue("Ошибка авторизации")
-                } else {
-                    return rejectWithValue(e.message)
-                }
-            } else {
-                throw e;
-            }
-        }
+        const response = await api.auth.getCurrentUserInfo();
+        return response;
     }
 );
 
@@ -57,11 +44,9 @@ export const authSlice = createSlice({
             state.user = null;
             state.status = "idle";
             state.token = null;
-            HTTP.defaults.headers.common['Authorization'] = `Bearer `;
         },
         resetToken: (state) => {
             state.token = null;
-            HTTP.defaults.headers.common['Authorization'] = `Bearer `;
         },
         setStatus: (state, action: PayloadAction<Status>) => {
             state.status = action.payload;
@@ -74,7 +59,6 @@ export const authSlice = createSlice({
                 (state, action: PayloadAction<string>) => {
                     state.status = "succeeded";
                     state.token = action.payload;
-                    HTTP.defaults.headers.common['Authorization'] = `Bearer ${action.payload}`;
                 }
             )
             .addCase(login.rejected, (state) => {

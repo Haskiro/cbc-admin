@@ -1,15 +1,26 @@
-import {FC, useEffect, useState} from 'react';
+import {FC, useEffect} from 'react';
 import NavBar from '../components/navbar/NavBar.tsx';
 import {Outlet, useNavigate} from "react-router-dom";
-import {useAppSelector} from "../store/types.ts";
+import {useAppDispatch, useAppSelector} from "../store/types.ts";
 import {HTTP} from "../api";
+import {resetToken} from "../store/slices/authSlice.ts";
 
 const MainLayout: FC = () => {
   const token = useAppSelector((state) => state.auth.token);
   const navigate = useNavigate();
-  HTTP.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  const dispatch = useAppDispatch()
+
   useEffect(() => {
     if (!token) navigate('/auth')
+    HTTP.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    HTTP.interceptors.response.use(function (response) {
+      return response;
+    }, function (error) {
+      if (error.response.status === 401) {
+        dispatch(resetToken())
+      }
+      return Promise.reject(error);
+    });
   }, [token])
 
 

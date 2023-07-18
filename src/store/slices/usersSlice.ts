@@ -21,21 +21,8 @@ export const getUsers = createAppAsyncThunk(
     "users/getUsers",
     async (_, {getState, dispatch, rejectWithValue}) => {
         const state = getState();
-        try {
-            const response = await api.users.getList();
-            return response;
-        } catch (e) {
-            if (isAxiosError(e)) {
-                if (e.response?.status === 401) {
-                    dispatch(resetToken());
-                    return rejectWithValue("Ошибка авторизации")
-                } else {
-                    return rejectWithValue(e.message)
-                }
-            } else {
-                throw e;
-            }
-        }
+        const response = await api.users.getList();
+        return response;
     }
 );
 
