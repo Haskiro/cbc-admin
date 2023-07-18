@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from "../store/types.ts";
 import {dateFormatter} from "../utils/dateFormatter.ts";
 import {withTimeout} from "../utils/withTimeout.ts";
 
-const Organizations: FC = () => {
+const Profile: FC = () => {
     const dispatch = useAppDispatch();
     const user = useAppSelector((state) => state.auth.user);
     const status = useAppSelector(state => state.auth.status)
@@ -40,4 +40,4 @@ const Organizations: FC = () => {
     )
 }
 
-export default Organizations;
+export default Profile;

@@ -10,7 +10,7 @@ export type ModalProps = {
     children: ReactNode
 }
 
-const Modal: FC<ModalProps> = ({isActive, onClose, title, children}) => {
+const Modal: FC<ModalProps> = React.memo(({isActive, onClose, title, children}) => {
 
 
         return (
@@ -30,7 +30,7 @@ const Modal: FC<ModalProps> = ({isActive, onClose, title, children}) => {
                         </div>
                     </div>
         );
-    }
+    })
 ;
 
 export default Modal;

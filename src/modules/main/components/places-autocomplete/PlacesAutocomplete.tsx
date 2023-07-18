@@ -1,16 +1,17 @@
-import React, {FC, useRef} from "react";
+import React, {FC, useEffect} from "react";
 import usePlacesAutocomplete, {getGeocode, getLatLng} from "use-places-autocomplete";
 import {UseFormRegister, UseFormSetValue} from "react-hook-form";
 import {OrganizationNew} from "../../../../types/organization.type.ts";
-import {Location} from "../../../../components/modal/Modal.tsx";
+import {Location} from "../OrganizationForm.tsx"
 
 export type PlaceAutocompleteProps = {
     onSelected: (location: Location) => void,
     register: UseFormRegister<OrganizationNew>,
-    setFieldValue: UseFormSetValue<OrganizationNew>
+    setFieldValue: UseFormSetValue<OrganizationNew>,
+    defaultValue?: string
 }
 
-const PlacesAutocomplete: FC<PlaceAutocompleteProps> = ({onSelected, register, setFieldValue}) => {
+const PlacesAutocomplete: FC<PlaceAutocompleteProps> = ({onSelected, register, setFieldValue, defaultValue}) => {
     const {
         ready,
         value,
@@ -19,7 +20,13 @@ const PlacesAutocomplete: FC<PlaceAutocompleteProps> = ({onSelected, register, s
         clearSuggestions,
     } = usePlacesAutocomplete();
 
-    const inputRef = useRef<HTMLInputElement>(null)
+    useEffect(() => {
+        if (defaultValue) {
+            setValue(defaultValue, false);
+        } else {
+            setValue("", false);
+        }
+    }, [defaultValue])
 
     const handleSelect = async (address: string) => {
         setValue(address, false);
@@ -28,7 +35,6 @@ const PlacesAutocomplete: FC<PlaceAutocompleteProps> = ({onSelected, register, s
         const results = await getGeocode({address});
         try {
             const {lng, lat} = await getLatLng(results[0]);
-            console.log(lat, lng)
             onSelected({
                 latitude: lat,
                 longitude: lng
@@ -57,7 +63,6 @@ const PlacesAutocomplete: FC<PlaceAutocompleteProps> = ({onSelected, register, s
                 required: "Укажите адрес(выберите из списка)"
             })}
             type="text"
-            ref={inputRef}
             className="absolute h-0 w-0 hidden"
         />
         {status === "OK" &&

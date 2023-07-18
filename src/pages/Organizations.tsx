@@ -1,4 +1,4 @@
-import {FC, useEffect, useState} from "react";
+import {FC, useCallback, useEffect, useState} from "react";
 import {Organization} from "../types/organization.type.ts";
 import Modal from "../components/modal/Modal.tsx";
 import {deleteOrg, deleteOrganization, getOrganizations, setStatus} from "../store/slices/organizationsSlice.ts";
@@ -14,10 +14,20 @@ const Organizations: FC = () => {
     const status = useAppSelector((state) => state.organizations.status);
     const currentCategory = useAppSelector(state => state.organizations.currentCategory);
     const deleteOrgStatus = useAppSelector((state) => state.organizations.deleteOrgStatus);
-    const closeModal = () => setIsModalOpen(false)
+    const [organizationToEdit, setOrganizationToEdit] = useState<Organization | null>(null);
+
+    const closeModal = () => {
+        setOrganizationToEdit(null);
+        setIsModalOpen(false)
+    }
 
     const handleDeleteOrg = async (id: string) => {
         await dispatch(deleteOrganization(id));
+    }
+
+    const handleEditOrganization = (organization: Organization) => {
+        setOrganizationToEdit(organization);
+        setIsModalOpen(true);
     }
 
     useEffect(() => {
@@ -28,7 +38,7 @@ const Organizations: FC = () => {
     return (
         <>
             <OrganizationForm isActive={isModalOpen}
-                   onClose={closeModal} />
+                   onClose={closeModal} formData={organizationToEdit} />
             <div className='w-full flex flex-col p-4'>
                 <div className='w-full bg-[#19181C] flex justify-between'>
                     <p className='h1-35-400'>Список организаций</p>
@@ -63,11 +73,16 @@ const Organizations: FC = () => {
                                 )}</p>
                                 <p className='text-[16px] h1-16-400 mb-4 w-full'
                                    title={organization.address}>{ellipsisLongText(organization.address, 40)}</p>
-                                <button className='bg-red-500 rounded-[12px] w-full py-2 disabled:opacity-75'
-                                        onClick={() => handleDeleteOrg(organization.id)}
-                                        disabled={deleteOrgStatus === "loading"}
-                                ><p
-                                    className='h1-16-400'>{deleteOrgStatus === "loading" ? "Удаление..." : "Удалить"}</p></button>
+                                <div className="flex justify-center gap-2 mt-3 w-full">
+                                    <button className='bg-orange-500 rounded-[12px] py-2 px-4 disabled:opacity-75'
+                                            onClick={() => handleEditOrganization(organization)}><p
+                                        className='h1-18-400'>Редактировать</p></button>
+                                    <button className='bg-red-500 rounded-[12px] py-2 px-4 disabled:opacity-75'
+                                            onClick={() => handleDeleteOrg(organization.id)}
+                                            disabled={deleteOrgStatus === "loading"}
+                                    ><p
+                                        className='h1-18-400'>Удалить</p></button>
+                                </div>
                             </div>
                         )
                         : null}

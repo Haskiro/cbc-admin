@@ -1,4 +1,4 @@
-import React, {FC, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {SubmitHandler, useForm} from "react-hook-form";
 import {useLoadScript} from "@react-google-maps/api";
 import {Library} from "@googlemaps/js-api-loader";
@@ -12,7 +12,7 @@ import Modal from "../../../components/modal/Modal.tsx";
 export type OrganizationFormProps = {
     onClose: () => void,
     isActive: boolean,
-    formData?: Organization
+    formData: Organization | null
 }
 
 export type Location = {
@@ -21,26 +21,53 @@ export type Location = {
 }
 
 const libraries = ["places"]
-const OrganizationForm: FC<OrganizationFormProps> = ({onClose, isActive, formData}) => {
-        const {register, handleSubmit, formState: {errors}, setValue, reset} = useForm<OrganizationNew>();
+const OrganizationForm: FC<OrganizationFormProps> = React.memo(({onClose, isActive, formData}) => {
+        const {register, handleSubmit, formState: {errors}, setValue, reset} = useForm<OrganizationNew>({
+            values: formData ? {
+                title: formData.title,
+                description: formData.description,
+                address: formData.address,
+                category: formData.category
+            } as OrganizationNew : {
+                title: "",
+                description: "",
+                address: "",
+                category: ""
+            } as OrganizationNew
+        });
         const {isLoaded} = useLoadScript({
             googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_KEY,
             libraries: libraries as Library[],
         });
+
+        useEffect(() => {
+            reset();
+        }, [])
         const createOrgStatus = useAppSelector((state) => state.organizations.createOrgStatus);
         const dispatch = useAppDispatch();
-        const [address, setAddress] = useState<Location | null>(null);
+        const [address, setAddress] = useState<Location | null>(formData ? {
+            latitude: formData.latitude,
+            longitude: formData.longitude
+        } : null);
 
         const onSubmit: SubmitHandler<OrganizationNew> = async (data) => {
             dispatch(setCreateOrgStatus("loading"))
             withTimeout(async () => {
                 try {
-                    await dispatch(createOrganization({
-                        ...data,
-                        icon: data.icon![0],
-                        ...address
-                    })).unwrap()
+                    if (!formData) {
+                        await dispatch(createOrganization({
+                            ...data,
+                            icon: data.icon![0],
+                            ...address
+                        })).unwrap()
+                    } else {
+                        console.log("Edit org with data: ", {
+                            ...data,
+                            ...address
+                        })
+                    }
                     onClose();
+                    reset();
 
                 } catch (e) {
                     return e;
@@ -70,8 +97,7 @@ const OrganizationForm: FC<OrganizationFormProps> = ({onClose, isActive, formDat
                                 <div className="h1-11-400 !text-[#FE0826]">{errors.title.message}</div>
                             )}
                             <label>Описание</label>
-                            <input
-                                type="text"
+                            <textarea
                                 className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-blue-400'
                                 {...register('description', {
                                     required: "Введите описание"
@@ -80,20 +106,21 @@ const OrganizationForm: FC<OrganizationFormProps> = ({onClose, isActive, formDat
                             {errors?.description && (
                                 <div className="h1-11-400 !text-[#FE0826]">{errors.description.message}</div>
                             )}
-                            <label>Изображение</label>
-                            <input
-                                type="file"
-                                className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-blue-400'
-                                {...register('icon', {
-                                    required: "Добавьте изображение"
-                                })}
-                            />
-                            {errors?.icon && (
-                                <div className="h1-11-400 !text-[#FE0826]">{errors.icon.message}</div>
-                            )}
+                            {!formData && <><label>Изображение</label>
+                                <input
+                                    type="file"
+                                    className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-blue-400'
+                                    {...register('icon', {
+                                        required: "Добавьте изображение"
+                                    })}
+                                />
+                                {errors?.icon && (
+                                    <div className="h1-11-400 !text-[#FE0826]">{errors.icon.message}</div>
+                                )}</>}
                             <PlacesAutocomplete register={register}
                                                 onSelected={(location: Location) => setAddress(location)}
                                                 setFieldValue={setValue}
+                                                defaultValue={formData ? formData.address : undefined}
                             />
                             {errors?.address && (
                                 <div className="h1-11-400 !text-[#FE0826]">{errors.address.message}</div>
@@ -117,7 +144,7 @@ const OrganizationForm: FC<OrganizationFormProps> = ({onClose, isActive, formDat
                     </Modal>
                 }</>
         );
-    }
+    })
 ;
 
 export default OrganizationForm;
