@@ -25,7 +25,7 @@ const Modal: FC<ModalProps> = React.memo(({isActive, onClose, title, children}) 
                                         onClose();
                                     }}>Закрыть
                             </button>
-                            <h1 className='text-blue-400 text-[24px]'>{title}</h1>
+                            <h1 className='text-[#123094] text-[24px]'>{title}</h1>
                             {children}
                         </div>
                     </div>

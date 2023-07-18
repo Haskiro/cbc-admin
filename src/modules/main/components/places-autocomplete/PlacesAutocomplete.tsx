@@ -49,7 +49,7 @@ const PlacesAutocomplete: FC<PlaceAutocompleteProps> = ({onSelected, register, s
     return (<>
         <label>Адрес</label>
         <input
-            className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-blue-400'
+            className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-[#123094]'
             placeholder="Город, улица, дом..."
             disabled={!ready}
             value={value}

@@ -32,6 +32,13 @@ const createOrganization = async (newOrg: Omit<OrganizationNew, "icon"> & {
     return res.data;
 }
 
+const editOrganization = async (orgData: Partial<Omit<OrganizationNew, "icon"> & {
+    icon: File;
+}>): Promise<{ok: boolean}> => {
+    const res: AxiosResponse<{ ok: boolean }> = await HTTP.patch("/organizations/edit", orgData, );
+    return res.data;
+}
+
 const deleteOrganization = async (id: string): Promise<{ ok: boolean }> => {
     const res: AxiosResponse<{ok: boolean}> = await HTTP.delete("/organizations/delete", {data: {id}});
     return res.data;
@@ -43,5 +50,6 @@ export default {
     getCategories,
     getOrganizationById,
     createOrganization,
-    deleteOrganization
+    deleteOrganization,
+    editOrganization
 }

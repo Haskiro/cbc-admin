@@ -9,7 +9,7 @@ import {resetToken} from "./authSlice.ts";
 export interface OrganizationsState {
     organizations: Organization[];
     status: Status;
-    createOrgStatus: Status;
+    createUpdateOrganizationStatus: Status;
     deleteOrgStatus: Status;
     error: string | null,
     categories: string[],
@@ -20,7 +20,7 @@ export interface OrganizationsState {
 const initialState: OrganizationsState = {
     organizations: [],
     status: "idle",
-    createOrgStatus: "idle",
+    createUpdateOrganizationStatus: "idle",
     deleteOrgStatus: "idle",
     error: null,
     categories: [],
@@ -30,7 +30,7 @@ const initialState: OrganizationsState = {
 
 export const getOrganizations = createAppAsyncThunk(
     "organizations/getOrganizations",
-    async (_, {getState, dispatch, rejectWithValue}) => {
+    async (_, {getState}) => {
         const state = getState();
         const response = await api.organizations.getList(state.organizations.currentCategory);
         return response.map(org => ({
@@ -44,7 +44,7 @@ export const createOrganization = createAppAsyncThunk(
     "organizations/createOrganization",
     async (newOrg: Omit<OrganizationNew, "icon"> & {
         icon: File;
-    }, {dispatch, rejectWithValue}) => {
+    }) => {
         const response = await api.organizations.createOrganization(newOrg);
         return response;
     }
@@ -60,6 +60,18 @@ export const deleteOrganization = createAppAsyncThunk(
     }
 );
 
+export const editOrganization = createAppAsyncThunk(
+    "organizations/editOrganization",
+    async (org: Partial<Omit<OrganizationNew, "icon"> & {
+        icon: File;
+    }>, {dispatch}) => {
+        const response = await api.organizations.editOrganization(org);
+        if (response.ok) {
+            dispatch(getOrganizations());
+        }
+    }
+);
+
 export const organizationsSlice = createSlice({
     name: 'organizations',
     initialState,
@@ -71,10 +83,18 @@ export const organizationsSlice = createSlice({
             state.status = action.payload;
         },
         setCreateOrgStatus: (state, action: PayloadAction<Status>) => {
-            state.createOrgStatus = action.payload;
+            state.createUpdateOrganizationStatus = action.payload;
         },
         deleteOrg: (state, action: PayloadAction<string>) => {
             state.organizations.splice(state.organizations.findIndex(el => el.id === action.payload), 1);
+        },
+        updateOrg: (state, action: PayloadAction<Organization>) => {
+            const existOrg = state.organizations.find(el => el.id === action.payload.id);
+            const existOrgIndex = state.organizations.findIndex(el => el.id === action.payload.id);
+            state.organizations[existOrgIndex] = {
+                ...existOrg,
+                ...action.payload
+            }
         }
     },
     extraReducers(builder) {
@@ -93,7 +113,7 @@ export const organizationsSlice = createSlice({
             .addCase(
                 createOrganization.fulfilled,
                 (state, action: PayloadAction<Organization>) => {
-                    state.createOrgStatus = "succeeded";
+                    state.createUpdateOrganizationStatus = "succeeded";
                     state.organizations.push({
                         ...action.payload,
                         icon: import.meta.env.VITE_API_URL + "/" + action.payload.icon
@@ -101,7 +121,7 @@ export const organizationsSlice = createSlice({
                 }
             )
             .addCase(createOrganization.rejected, (state, action) => {
-                state.createOrgStatus = "failed";
+                state.createUpdateOrganizationStatus = "failed";
                 state.error = action.payload || null;
             })
             .addCase(
@@ -120,9 +140,19 @@ export const organizationsSlice = createSlice({
                 state.deleteOrgStatus = "failed";
                 state.error = action.payload || null;
             })
+            .addCase(
+                editOrganization.fulfilled,
+                (state) => {
+                    state.createUpdateOrganizationStatus = "succeeded";
+                }
+            )
+            .addCase(editOrganization.rejected, (state, action) => {
+                state.createUpdateOrganizationStatus = "failed";
+                state.error = action.payload || null;
+            })
     }
 })
 
-export const {setCategory, setStatus, setCreateOrgStatus, deleteOrg} = organizationsSlice.actions;
+export const {setCategory, setStatus, setCreateOrgStatus, deleteOrg, updateOrg} = organizationsSlice.actions;
 
 export default organizationsSlice.reducer

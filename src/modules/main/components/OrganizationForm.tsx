@@ -5,7 +5,7 @@ import {Library} from "@googlemaps/js-api-loader";
 import {useAppDispatch, useAppSelector} from "../../../store/types.ts";
 import {Organization, OrganizationNew} from "../../../types/organization.type.ts";
 import {withTimeout} from "../../../utils/withTimeout.ts";
-import {createOrganization, setCreateOrgStatus} from "../../../store/slices/organizationsSlice.ts";
+import {createOrganization, editOrganization, setCreateOrgStatus} from "../../../store/slices/organizationsSlice.ts";
 import PlacesAutocomplete from "./places-autocomplete/PlacesAutocomplete.tsx";
 import Modal from "../../../components/modal/Modal.tsx";
 
@@ -43,7 +43,7 @@ const OrganizationForm: FC<OrganizationFormProps> = React.memo(({onClose, isActi
         useEffect(() => {
             reset();
         }, [])
-        const createOrgStatus = useAppSelector((state) => state.organizations.createOrgStatus);
+        const createUpdateOrganizationStatus = useAppSelector((state) => state.organizations.createUpdateOrganizationStatus);
         const dispatch = useAppDispatch();
         const [address, setAddress] = useState<Location | null>(formData ? {
             latitude: formData.latitude,
@@ -61,10 +61,14 @@ const OrganizationForm: FC<OrganizationFormProps> = React.memo(({onClose, isActi
                             ...address
                         })).unwrap()
                     } else {
-                        console.log("Edit org with data: ", {
-                            ...data,
+                        await dispatch(editOrganization({
+                            id: formData.id,
+                            title: data.title,
+                            description: data.description,
+                            address: data.address,
+                            category: data.category,
                             ...address
-                        })
+                        })).unwrap()
                     }
                     onClose();
                     reset();
@@ -83,12 +87,12 @@ const OrganizationForm: FC<OrganizationFormProps> = React.memo(({onClose, isActi
                         reset()
                     }} title={formData ? "Редактирование организации" : "Создание организации"}>
                         <form onSubmit={handleSubmit(onSubmit)}
-                              className='flex-col flex items-start justify-center text-blue-400 text-[14px] w-full'
+                              className='flex-col flex items-start justify-center text-[#123094] text-[14px] w-full'
                         >
                             <label>Название</label>
                             <input
                                 type="text"
-                                className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-blue-400'
+                                className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-[#123094]'
                                 {...register('title', {
                                     required: "Введите название"
                                 })}
@@ -98,7 +102,7 @@ const OrganizationForm: FC<OrganizationFormProps> = React.memo(({onClose, isActi
                             )}
                             <label>Описание</label>
                             <textarea
-                                className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-blue-400'
+                                className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-[#123094]'
                                 {...register('description', {
                                     required: "Введите описание"
                                 })}
@@ -109,7 +113,7 @@ const OrganizationForm: FC<OrganizationFormProps> = React.memo(({onClose, isActi
                             {!formData && <><label>Изображение</label>
                                 <input
                                     type="file"
-                                    className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-blue-400'
+                                    className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-[#123094]'
                                     {...register('icon', {
                                         required: "Добавьте изображение"
                                     })}
@@ -128,7 +132,7 @@ const OrganizationForm: FC<OrganizationFormProps> = React.memo(({onClose, isActi
                             <label>Категория</label>
                             <input
                                 type="text"
-                                className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-blue-400'
+                                className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-[#123094]'
                                 {...register('category', {
                                     required: "Введите категорию"
                                 })}
@@ -137,8 +141,8 @@ const OrganizationForm: FC<OrganizationFormProps> = React.memo(({onClose, isActi
                                 <div className="h1-11-400 !text-[#FE0826]">{errors.category.message}</div>
                             )}
                             <button type="submit"
-                                    disabled={createOrgStatus === "loading"}
-                                    className='w-full bg-blue-400 rounded-md text-white py-2 mt-4 disabled: opacity-75'>{createOrgStatus === "loading" ? "Создание..." : "Создать"}
+                                    disabled={createUpdateOrganizationStatus === "loading"}
+                                    className='w-full bg-[#123094] hover:bg-[#121094] rounded-md text-white py-2 mt-4 disabled: opacity-75'>{createUpdateOrganizationStatus === "loading" ? "Сохранение..." : "Сохранить"}
                             </button>
                         </form>
                     </Modal>
