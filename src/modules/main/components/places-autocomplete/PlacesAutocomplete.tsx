@@ -2,7 +2,7 @@ import React, {FC, useEffect} from "react";
 import usePlacesAutocomplete, {getGeocode, getLatLng} from "use-places-autocomplete";
 import {UseFormRegister, UseFormSetValue} from "react-hook-form";
 import {OrganizationNew} from "../../../../types/organization.type.ts";
-import {Location} from "../OrganizationForm.tsx"
+import {Location} from "../forms/OrganizationForm.tsx"
 
 export type PlaceAutocompleteProps = {
     onSelected: (location: Location) => void,

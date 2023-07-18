@@ -5,7 +5,7 @@ import {deleteOrg, deleteOrganization, getOrganizations, setStatus} from "../sto
 import {useAppDispatch, useAppSelector} from "../store/types.ts";
 import {ellipsisLongText} from "../utils/ellipsisLongText.ts";
 import {withTimeout} from "../utils/withTimeout.ts";
-import OrganizationForm from "../modules/main/components/OrganizationForm.tsx";
+import OrganizationForm from "../modules/main/components/forms/OrganizationForm.tsx";
 
 const Organizations: FC = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -16,10 +16,10 @@ const Organizations: FC = () => {
     const deleteOrgStatus = useAppSelector((state) => state.organizations.deleteOrgStatus);
     const [organizationToEdit, setOrganizationToEdit] = useState<Organization | null>(null);
 
-    const closeModal = () => {
+    const closeModal = useCallback(() => {
         setOrganizationToEdit(null);
         setIsModalOpen(false)
-    }
+    }, [])
 
     const handleDeleteOrg = async (id: string) => {
         await dispatch(deleteOrganization(id));
@@ -74,7 +74,7 @@ const Organizations: FC = () => {
                                 <p className='text-[16px] h1-16-400 mb-4 w-full'
                                    title={organization.address}>{ellipsisLongText(organization.address, 40)}</p>
                                 <div className="flex justify-center gap-2 mt-3 w-full">
-                                    <button className='bg-orange-500 rounded-[12px] py-2 px-4 disabled:opacity-75'
+                                    <button className='bg-[#123094] hover:bg-[#121094] rounded-[12px] py-2 px-4 disabled:opacity-75'
                                             onClick={() => handleEditOrganization(organization)}><p
                                         className='h1-18-400'>Редактировать</p></button>
                                     <button className='bg-red-500 rounded-[12px] py-2 px-4 disabled:opacity-75'

@@ -2,12 +2,12 @@ import React, {FC, useEffect, useState} from 'react';
 import {SubmitHandler, useForm} from "react-hook-form";
 import {useLoadScript} from "@react-google-maps/api";
 import {Library} from "@googlemaps/js-api-loader";
-import {useAppDispatch, useAppSelector} from "../../../store/types.ts";
-import {Organization, OrganizationNew} from "../../../types/organization.type.ts";
-import {withTimeout} from "../../../utils/withTimeout.ts";
-import {createOrganization, editOrganization, setCreateOrgStatus} from "../../../store/slices/organizationsSlice.ts";
-import PlacesAutocomplete from "./places-autocomplete/PlacesAutocomplete.tsx";
-import Modal from "../../../components/modal/Modal.tsx";
+import {useAppDispatch, useAppSelector} from "../../../../store/types.ts";
+import {Organization, OrganizationNew} from "../../../../types/organization.type.ts";
+import {withTimeout} from "../../../../utils/withTimeout.ts";
+import {createOrganization, editOrganization, setCreateOrgStatus} from "../../../../store/slices/organizationsSlice.ts";
+import PlacesAutocomplete from "../places-autocomplete/PlacesAutocomplete.tsx";
+import Modal from "../../../../components/modal/Modal.tsx";
 
 export type OrganizationFormProps = {
     onClose: () => void,
