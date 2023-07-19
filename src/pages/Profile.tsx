@@ -1,10 +1,13 @@
-import {FC, useEffect} from "react";
+import {FC, useCallback, useEffect, useState} from "react";
 import {getUserInfo, setStatus} from "../store/slices/authSlice.ts";
 import {useAppDispatch, useAppSelector} from "../store/types.ts";
 import {dateFormatter} from "../utils/dateFormatter.ts";
 import {withTimeout} from "../utils/withTimeout.ts";
+import {User} from "../types/user.type.ts";
+import UserForm from "../modules/main/components/forms/UserForm.tsx";
 
 const Profile: FC = () => {
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     const dispatch = useAppDispatch();
     const user = useAppSelector((state) => state.auth.user);
     const status = useAppSelector(state => state.auth.status)
@@ -14,9 +17,17 @@ const Profile: FC = () => {
         withTimeout(() => dispatch(getUserInfo()))
     }, [])
 
+    const handleEditUser = () => {
+        setIsModalOpen(true);
+    }
+
+    const closeModal = useCallback(() => {
+        setIsModalOpen(false)
+    }, [])
+
     return (
         <>
-
+            <UserForm onClose={closeModal} isActive={isModalOpen} formData={user} />
             <div className='w-full flex flex-col p-4'>
                 <p className='h1-35-400'>Профиль</p>
                 <div className="mt-3">
@@ -33,7 +44,7 @@ const Profile: FC = () => {
                                 регистрации: {dateFormatter(new Date(user.createdAt))}</p>
                             <div className="flex justify-center gap-2 mt-3 w-full">
                                 <button className='bg-[#123094] hover:bg-[#121094] rounded-[12px] py-2 px-4 disabled:opacity-75'
-                                        onClick={() => console.log("edit")}><p
+                                        onClick={handleEditUser}><p
                                     className='h1-18-400'>Редактировать</p></button>
                             </div>
                         </div>

@@ -1,6 +1,5 @@
 import {AxiosResponse} from "axios";
 import {HTTP} from "./index";
-import {Organization} from "../types/organization.type";
 import {User} from "../types/user.type.ts";
 
 const getList = async (): Promise<User[]> => {
@@ -9,7 +8,7 @@ const getList = async (): Promise<User[]> => {
 }
 
 const editUser = async (newUserData: Partial<User>): Promise<{ ok: boolean }> => {
-    const res: AxiosResponse<{ok: boolean}> = await HTTP.patch("/accounts/edit");
+    const res: AxiosResponse<{ok: boolean}> = await HTTP.patch("/accounts/edit", newUserData);
     return res.data;
 }
 

@@ -15,10 +15,8 @@ const Users: FC = () => {
     const dispatch = useAppDispatch();
     const users = useAppSelector((state) => state.users.users);
     const status = useAppSelector((state) => state.users.status);
-    const [userToEdit, setUserToEdit] = useState<User | null>(null);
 
     const closeModal = useCallback(() => {
-        setUserToEdit(null);
         setIsModalOpen(false)
     }, [])
 
@@ -27,19 +25,14 @@ const Users: FC = () => {
         withTimeout(() => dispatch(getUsers()))
     }, [])
 
-    const handleDeleteUser= async (id: string) => {
+    const handleDeleteUser = async (id: string) => {
         console.log("user to delete: " + id);
         // await dispatch(deleteOrganization(id));
     }
 
-    const handleEditUser = (user: User) => {
-        setUserToEdit(user);
-        setIsModalOpen(true);
-    }
-
     return (
         <>
-            <UserForm onClose={closeModal} isActive={isModalOpen} formData={userToEdit} />
+            <UserForm onClose={closeModal} isActive={isModalOpen} formData={null}/>
             <div className='w-full flex flex-col p-4'>
                 <div className='w-full bg-[#19181C] flex justify-between'>
                     <p className='h1-35-400'>Список пользователей</p>
@@ -59,25 +52,26 @@ const Users: FC = () => {
                     {status === "succeeded" ?
 
                         users.map((user) =>
-                            <div className='w-[350px] flex-col gap-1 p-4 rounded-xl bg-[#F6FBFF]'
+                            <div className='w-[280px] flex flex-col justify-between  p-4 rounded-xl bg-[#F6FBFF]'
                                  key={user.id}>
-                                <p className="text-[#123094] font-semibold text-[18px]">Имя: {user.firstName}</p>
-                                <p className="text-[#123094] font-semibold text-[18px]">Фамилия: {user.lastName}</p>
-                                <p className="text-[#123094] font-semibold text-[18px]">Почта: {user.email}</p>
-                                <p className="text-[#123094] font-semibold text-[18px]">Дата
-                                    регистрации: {dateFormatter(new Date(user.createdAt))}</p>
-                                {user.loyaltyCard ? <><p className="text-[#123094] font-semibold text-[18px]">Карта лояльности: {user.loyaltyCard.number}</p>
+                                <div className="flex flex-col gap-1 text-[#123094] font-semibold text-[16px]">
+                                    <p>Имя: {user.firstName}</p>
+                                    <p>Фамилия: {user.lastName}</p>
+                                    {user.email !== "user@fund.ru" ?
+                                        <p>Почта: {user.email}</p> : null}
+                                    <p>Дата
+                                        регистрации: {dateFormatter(new Date(user.createdAt))}</p>
+                                    {user.loyaltyCard ? <><p>Карта
+                                        лояльности: {user.loyaltyCard.number}</p>
                                     </> : null}
-                                {user.isConfirmed ? <p className='font-semibold text-[18px] text-green-500'>Подтвержден</p> : <p className='font-semibold text-[18px] text-red-500'>Не подтвержден</p>}
+                                    {/*{user.isConfirmed ? <p className='font-semibold text-[18px] text-green-500'>Подтвержден</p> : <p className='font-semibold text-[18px] text-red-500'>Не подтвержден</p>}*/}
+                                </div>
                                 <div className="flex justify-center gap-2 mt-3">
-                                    <button className='bg-[#123094] hover:bg-[#121094] rounded-[12px] py-2 px-4 disabled:opacity-75'
-                                            onClick={() => handleEditUser(user)}><p
-                                        className='h1-18-400'>Редактировать</p></button>
                                     <button className='bg-red-500 rounded-[12px] py-2 px-4 disabled:opacity-75'
                                             onClick={() => handleDeleteUser(user.id)}
-                                            // disabled={deleteOrgStatus === "loading"}
+                                        // disabled={deleteOrgStatus === "loading"}
                                     ><p
-                                        className='h1-18-400'>Удалить</p></button>
+                                        className='h1-16-400'>Удалить</p></button>
                                 </div>
                             </div>
                         )

@@ -56,6 +56,8 @@ export const deleteOrganization = createAppAsyncThunk(
         const response = await api.organizations.deleteOrganization(id);
         if (response.ok) {
             dispatch(deleteOrg(id));
+        } else {
+            rejectWithValue("Ошибка удаления организации");
         }
     }
 );
@@ -64,10 +66,12 @@ export const editOrganization = createAppAsyncThunk(
     "organizations/editOrganization",
     async (org: Partial<Omit<OrganizationNew, "icon"> & {
         icon: File;
-    }>, {dispatch}) => {
+    }>, {dispatch, rejectWithValue}) => {
         const response = await api.organizations.editOrganization(org);
         if (response.ok) {
             dispatch(getOrganizations());
+        } else {
+            rejectWithValue("Ошибка редактирования организации");
         }
     }
 );
