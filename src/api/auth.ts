@@ -16,7 +16,13 @@ const getCurrentUserInfo = async (): Promise<User> => {
     return res.data;
 }
 
+const changePassword = async (passwordData: {password: string, newPassword: string}): Promise<{ok?: boolean, message?: string}> => {
+    const res: AxiosResponse<{ok?: boolean, message?: string}> = await HTTP.patch("/accounts/changePassword", passwordData);
+    return  res.data;
+}
+
 export default {
     loginUser,
-    getCurrentUserInfo
+    getCurrentUserInfo,
+    changePassword
 }

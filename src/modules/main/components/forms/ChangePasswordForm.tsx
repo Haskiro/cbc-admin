@@ -2,6 +2,7 @@ import React, {FC, useEffect} from 'react';
 import {SubmitHandler, useForm} from "react-hook-form";
 import {useAppDispatch, useAppSelector} from "../../../../store/types.ts";
 import {withTimeout} from "../../../../utils/withTimeout.ts";
+import {changePassword} from "../../../../store/slices/authSlice.ts";
 
 export type ChangePasswordForm = {
     onClose: () => void,
@@ -16,6 +17,7 @@ const UserForm: FC<ChangePasswordForm> = React.memo(({onClose}) => {
 
         useEffect(() => {
             reset();
+            dispatch(changePassword({password: "admin", newPassword: "admin"}));
         }, [])
         const changePasswordStatus = useAppSelector((state) => state.users.createUpdateUserStatus);
         const dispatch = useAppDispatch();

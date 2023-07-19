@@ -48,8 +48,6 @@ export const editUser = createAppAsyncThunk(
                 dispatch(getUserInfo());
                 dispatch(editUserInfo({id, newUserData}))
             });
-        } else {
-            rejectWithValue("Ошибка изменения данных пользователя");
         }
     }
 )
@@ -61,8 +59,6 @@ export const createClient = createAppAsyncThunk(
         if (response.id) {
             dispatch(setStatus("loading"));
             withTimeout(() => dispatch(getUsers()));
-        } else {
-            rejectWithValue("Ошибка создания пользователя");
         }
     }
 )
@@ -73,8 +69,6 @@ export const blockCard = createAppAsyncThunk(
         const response = await api.users.blockCard(card);
         if (response.ok) {
             dispatch(blockCardLocally({userId: card.accountId}));
-        } else {
-            rejectWithValue("Ошибка блокирования карты");
         }
     }
 )
@@ -124,7 +118,7 @@ export const usersSlice = createSlice({
             )
             .addCase(editUser.rejected, (state, action) => {
                 state.createUpdateUserStatus = "failed";
-                state.error = action.payload || null;
+                state.error = action.error.message || null;
             })
             .addCase(
                 createClient.fulfilled,
@@ -134,7 +128,7 @@ export const usersSlice = createSlice({
             )
             .addCase(createClient.rejected, (state, action) => {
                 state.createUpdateUserStatus = "failed";
-                state.error = action.payload || null;
+                state.error = action.error.message || null;
             })
             .addCase(
                 blockCard.fulfilled,
@@ -144,7 +138,7 @@ export const usersSlice = createSlice({
             )
             .addCase(blockCard.rejected, (state, action) => {
                 state.blockCardStatus = "failed";
-                state.error = action.payload || null;
+                state.error = action.error.message || null;
             })
     }
 })

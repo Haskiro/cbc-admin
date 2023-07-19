@@ -12,15 +12,15 @@ export const HTTP = axios.create({
 });
 
 HTTP.interceptors.response.use((response) => {
-    if (response.data.message) {
-        const customError = new CustomError(response.data.message);
-        customError.response = response;
+    return response;
+}, (error) => {
+    if (error.response.data.message) {
+        const customError = new CustomError(error.response.data.message);
+        customError.response = error.response;
         customError.isAxiosError = true;
 
         return Promise.reject(customError);
     }
-    return response;
-}, (error) => {
     return Promise.reject(error);
 });
 

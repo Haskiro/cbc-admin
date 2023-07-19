@@ -56,8 +56,6 @@ export const deleteOrganization = createAppAsyncThunk(
         const response = await api.organizations.deleteOrganization(id);
         if (response.ok) {
             dispatch(deleteOrg(id));
-        } else {
-            rejectWithValue("Ошибка удаления организации");
         }
     }
 );
@@ -70,8 +68,6 @@ export const editOrganization = createAppAsyncThunk(
         const response = await api.organizations.editOrganization(org);
         if (response.ok) {
             dispatch(getOrganizations());
-        } else {
-            rejectWithValue("Ошибка редактирования организации");
         }
     }
 );
@@ -112,7 +108,7 @@ export const organizationsSlice = createSlice({
             )
             .addCase(getOrganizations.rejected, (state, action) => {
                 state.status = "failed";
-                state.error = action.payload || null;
+                state.error = action.error.message || null;
             })
             .addCase(
                 createOrganization.fulfilled,
@@ -126,7 +122,7 @@ export const organizationsSlice = createSlice({
             )
             .addCase(createOrganization.rejected, (state, action) => {
                 state.createUpdateOrganizationStatus = "failed";
-                state.error = action.payload || null;
+                state.error = action.error.message || null;
             })
             .addCase(
                 deleteOrganization.pending,
@@ -142,7 +138,7 @@ export const organizationsSlice = createSlice({
             )
             .addCase(deleteOrganization.rejected, (state, action) => {
                 state.deleteOrgStatus = "failed";
-                state.error = action.payload || null;
+                state.error = action.error.message || null;
             })
             .addCase(
                 editOrganization.fulfilled,
@@ -152,7 +148,7 @@ export const organizationsSlice = createSlice({
             )
             .addCase(editOrganization.rejected, (state, action) => {
                 state.createUpdateOrganizationStatus = "failed";
-                state.error = action.payload || null;
+                state.error = action.error.message || null;
             })
     }
 })
