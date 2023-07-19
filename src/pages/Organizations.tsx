@@ -6,15 +6,40 @@ import {useAppDispatch, useAppSelector} from "../store/types.ts";
 import {ellipsisLongText} from "../utils/ellipsisLongText.ts";
 import {withTimeout} from "../utils/withTimeout.ts";
 import OrganizationForm from "../modules/main/components/forms/OrganizationForm.tsx";
+import Notification from "../components/Notification.tsx";
 
 const Organizations: FC = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     const dispatch = useAppDispatch();
     const organizations = useAppSelector((state) => state.organizations.organizations);
     const status = useAppSelector((state) => state.organizations.status);
+    const error = useAppSelector((state) => state.organizations.error);
     const currentCategory = useAppSelector(state => state.organizations.currentCategory);
     const deleteOrgStatus = useAppSelector((state) => state.organizations.deleteOrgStatus);
+    const createUpdateOrganizationStatus = useAppSelector((state) => state.organizations.createUpdateOrganizationStatus);
     const [organizationToEdit, setOrganizationToEdit] = useState<Organization | null>(null);
+    const [isNotificationActive, setIsNotificationActive] = useState<boolean>(false);
+
+    const activateNotification = (trigger: boolean) => {
+        if (trigger) {
+            setIsNotificationActive(true);
+            withTimeout(() => {
+                setIsNotificationActive(false)
+            }, 10000);
+        }
+    }
+
+    useEffect(() => {
+        activateNotification(deleteOrgStatus === "succeeded")
+    }, [deleteOrgStatus])
+
+    useEffect(() => {
+        activateNotification(createUpdateOrganizationStatus === "succeeded")
+    }, [createUpdateOrganizationStatus])
+
+    useEffect(() => {
+        activateNotification(!!error);
+    }, [error])
 
     const closeModal = useCallback(() => {
         setOrganizationToEdit(null);
@@ -37,6 +62,8 @@ const Organizations: FC = () => {
 
     return (
         <>
+            {error ? <Notification message={error} isActive={isNotificationActive} type={"error"} /> : null}
+            <Notification message={"Данные об организациях успешно обновлены"} isActive={isNotificationActive} type={"success"} />
             <OrganizationForm isActive={isModalOpen}
                    onClose={closeModal} formData={organizationToEdit} />
             <div className='w-full flex flex-col p-4'>

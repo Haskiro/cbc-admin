@@ -48,7 +48,7 @@ const Autorization = () => {
 
     return (
         <>
-        {error ? <Notification message={error!} isActive={isNotificationActive} type={"error"} /> : null}
+        {error ? <Notification message={error} isActive={isNotificationActive} type={"error"} /> : null}
         <form onSubmit={handleSubmit(onSubmit)}
               className="w-full h-[100vh] bg-[#19181C] flex flex-col justify-center items-center">
             <h1 className="h1-30-400">LOGO</h1>

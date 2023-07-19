@@ -5,16 +5,38 @@ import {blockCard, getUsers, setBlockCardStatus, setStatus} from "../store/slice
 import {dateFormatter} from "../utils/dateFormatter.ts";
 import UserForm from "../modules/main/components/forms/UserForm.tsx";
 import {LoyaltyCard} from "../types/user.type.ts";
+import Notification from "../components/Notification.tsx";
 
 const Users: FC = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     const dispatch = useAppDispatch();
     const users = useAppSelector((state) => state.users.users);
     const status = useAppSelector((state) => state.users.status);
+    const createUpdateUserStatus = useAppSelector((state) => state.users.createUpdateUserStatus);
     const blockCardStatus = useAppSelector((state) => state.users.blockCardStatus);
+    const error = useAppSelector((state) => state.users.error);
     const closeModal = useCallback(() => {
         setIsModalOpen(false)
     }, [])
+
+    const [isNotificationActive, setIsNotificationActive] = useState<boolean>(false);
+
+    const activateNotification = (trigger: boolean) => {
+        if (trigger) {
+            setIsNotificationActive(true);
+            withTimeout(() => {
+                setIsNotificationActive(false)
+            }, 10000);
+        }
+    }
+
+    useEffect(() => {
+        activateNotification(createUpdateUserStatus === "succeeded")
+    }, [createUpdateUserStatus])
+
+    useEffect(() => {
+        activateNotification(!!error);
+    }, [error])
 
     useEffect(() => {
         dispatch(setStatus("loading"));
@@ -31,6 +53,8 @@ const Users: FC = () => {
 
     return (
         <>
+            {error ? <Notification message={error} isActive={true} type={"error"} /> : null}
+            <Notification message={"Данные об пользователях успешно обновлены"} isActive={isNotificationActive} type={"success"} />
             <UserForm onClose={closeModal} isActive={isModalOpen} formData={null}/>
             <div className='w-full flex flex-col p-4'>
                 <div className='w-full bg-[#19181C] flex justify-between'>
