@@ -1,16 +1,17 @@
 import {FC, useCallback, useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../store/types.ts";
 import {withTimeout} from "../utils/withTimeout.ts";
-import {getUsers, setStatus} from "../store/slices/usersSlice.ts";
+import {blockCard, getUsers, setBlockCardStatus, setStatus} from "../store/slices/usersSlice.ts";
 import {dateFormatter} from "../utils/dateFormatter.ts";
 import UserForm from "../modules/main/components/forms/UserForm.tsx";
+import {LoyaltyCard} from "../types/user.type.ts";
 
 const Users: FC = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     const dispatch = useAppDispatch();
     const users = useAppSelector((state) => state.users.users);
     const status = useAppSelector((state) => state.users.status);
-
+    const blockCardStatus = useAppSelector((state) => state.users.blockCardStatus);
     const closeModal = useCallback(() => {
         setIsModalOpen(false)
     }, [])
@@ -20,9 +21,12 @@ const Users: FC = () => {
         withTimeout(() => dispatch(getUsers()))
     }, [])
 
-    const handleDeleteUser = async (id: string) => {
-        console.log("user to delete: " + id);
-        // await dispatch(deleteOrganization(id));
+
+    const handleBlockCard = async (card: LoyaltyCard) => {
+        console.log("Block card")
+        dispatch(setBlockCardStatus("loading"));
+        dispatch(blockCard(card));
+        withTimeout(() => dispatch(blockCard(card)));
     }
 
     return (
@@ -59,15 +63,23 @@ const Users: FC = () => {
                                     {user.loyaltyCard ? <><p>Карта
                                         лояльности: {user.loyaltyCard.number}</p>
                                     </> : null}
-                                    {/*{user.isConfirmed ? <p className='font-semibold text-[18px] text-green-500'>Подтвержден</p> : <p className='font-semibold text-[18px] text-red-500'>Не подтвержден</p>}*/}
+                                    {user.loyaltyCard ? <>
+                                        <div>Статус
+                                            карты: {user.loyaltyCard.isBlocked ?
+                                                <span className="text-red-500">Заблокирована</span> :
+                                                <span className='text-green-500'>Активна</span>
+                                            }
+                                        </div>
+                                    </> : null}
                                 </div>
-                                <div className="flex justify-center gap-2 mt-3">
-                                    <button className='bg-red-500 rounded-[12px] py-2 px-4 disabled:opacity-75'
-                                            onClick={() => handleDeleteUser(user.id)}
-                                        // disabled={deleteOrgStatus === "loading"}
-                                    ><p
-                                        className='h1-16-400'>Удалить</p></button>
-                                </div>
+                                {user.loyaltyCard && !user.loyaltyCard.isBlocked ?
+                                    <div className="flex justify-center gap-2 mt-3 w-full">
+                                        <button className='bg-red-500 rounded-[12px] py-2 px-4 disabled:opacity-75'
+                                                onClick={() => handleBlockCard(user.loyaltyCard)}
+                                            disabled={blockCardStatus === "loading"}
+                                        ><p
+                                            className='h1-16-400'>{blockCardStatus === "loading" ? "Блокирование" : "Заблокировать карту"}</p></button>
+                                    </div> : null}
                             </div>
                         )
                         : null}

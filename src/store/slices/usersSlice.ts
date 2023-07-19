@@ -2,7 +2,7 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 import api from "../../api"
 import {Status} from "../../types/status.type.ts";
 import {createAppAsyncThunk} from "../types.ts";
-import {User, UserCreate} from "../../types/user.type.ts";
+import {LoyaltyCard, User, UserCreate} from "../../types/user.type.ts";
 import {getUserInfo} from "./authSlice.ts";
 import {withTimeout} from "../../utils/withTimeout.ts";
 import {setStatus as setAuthStatus} from "./authSlice.ts";
@@ -12,6 +12,7 @@ export interface UsersState {
     users: User[];
     status: Status;
     createUpdateUserStatus: Status;
+    blockCardStatus: Status;
     error: string | null;
 }
 
@@ -19,6 +20,7 @@ const initialState: UsersState = {
     users: [],
     status: "idle",
     createUpdateUserStatus: "idle",
+    blockCardStatus: "idle",
     error: null
 }
 
@@ -37,7 +39,7 @@ export const getUsers = createAppAsyncThunk(
 
 export const editUser = createAppAsyncThunk(
     "users/editUser",
-    async ({newUserData, id}: EditUserParams, {dispatch, rejectWithValue}) =>  {
+    async ({newUserData, id}: EditUserParams, {dispatch, rejectWithValue}) => {
         const response = await api.users.editUser(newUserData);
         if (response.ok) {
             dispatch(setStatus("loading"));
@@ -52,15 +54,27 @@ export const editUser = createAppAsyncThunk(
     }
 )
 
-export const createClient  = createAppAsyncThunk(
+export const createClient = createAppAsyncThunk(
     "users/createClient",
-    async (newUser: UserCreate, {dispatch, rejectWithValue}) =>  {
+    async (newUser: UserCreate, {dispatch, rejectWithValue}) => {
         const response = await api.users.createClient(newUser);
         if (response.id) {
             dispatch(setStatus("loading"));
             withTimeout(() => dispatch(getUsers()));
         } else {
             rejectWithValue("Ошибка создания пользователя");
+        }
+    }
+)
+
+export const blockCard = createAppAsyncThunk(
+    "users/blockCard",
+    async (card: LoyaltyCard, {dispatch, rejectWithValue}) => {
+        const response = await api.users.blockCard(card);
+        if (response.ok) {
+            dispatch(blockCardLocally({userId: card.accountId}));
+        } else {
+            rejectWithValue("Ошибка блокирования карты");
         }
     }
 )
@@ -75,12 +89,19 @@ export const usersSlice = createSlice({
         setCreateUpdateUserStatus: (state, action: PayloadAction<Status>) => {
             state.createUpdateUserStatus = action.payload;
         },
-        editUserInfo: (state, action: PayloadAction<{id: string, newUserData: Partial<User>}>) => {
+        editUserInfo: (state, action: PayloadAction<{ id: string, newUserData: Partial<User> }>) => {
             const existsUserIndex = state.users.findIndex(el => el.id === action.payload.id);
             state.users[existsUserIndex] = {
                 ...state.users[existsUserIndex],
                 ...action.payload.newUserData
             };
+        },
+        setBlockCardStatus: (state, action: PayloadAction<Status>) => {
+            state.blockCardStatus = action.payload;
+        },
+        blockCardLocally: (state, action: PayloadAction<{ userId: string }>) => {
+            const existsUser = state.users.find(el => el.id === action.payload.userId);
+            existsUser!.loyaltyCard!.isBlocked = true;
         }
     },
     extraReducers(builder) {
@@ -115,9 +136,25 @@ export const usersSlice = createSlice({
                 state.createUpdateUserStatus = "failed";
                 state.error = action.payload || null;
             })
+            .addCase(
+                blockCard.fulfilled,
+                (state) => {
+                    state.blockCardStatus = "succeeded";
+                }
+            )
+            .addCase(blockCard.rejected, (state, action) => {
+                state.blockCardStatus = "failed";
+                state.error = action.payload || null;
+            })
     }
 })
 
-export const {setStatus, editUserInfo, setCreateUpdateUserStatus} = usersSlice.actions;
+export const {
+    setStatus,
+    editUserInfo,
+    setCreateUpdateUserStatus,
+    blockCardLocally,
+    setBlockCardStatus
+} = usersSlice.actions;
 
 export default usersSlice.reducer

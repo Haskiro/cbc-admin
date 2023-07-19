@@ -1,6 +1,6 @@
 import {AxiosResponse} from "axios";
 import {HTTP} from "./index";
-import {User, UserCreate} from "../types/user.type.ts";
+import {LoyaltyCard, User, UserCreate} from "../types/user.type.ts";
 
 const getList = async (): Promise<User[]> => {
     const res: AxiosResponse<User[]> = await HTTP.get("/accounts/getList");
@@ -17,8 +17,18 @@ const createClient = async(newUser: UserCreate): Promise<Partial<User>> => {
     return res.data;
 }
 
+const blockCard = async(card: LoyaltyCard): Promise<{ ok: boolean }> => {
+    const res: AxiosResponse<{ ok: boolean }> = await HTTP.patch("/cards/block", {
+        id: card.id,
+        number: card.number,
+        accountId: card.accountId
+    });
+    return res.data;
+}
+
 export default {
     getList,
     editUser,
-    createClient
+    createClient,
+    blockCard
 }
