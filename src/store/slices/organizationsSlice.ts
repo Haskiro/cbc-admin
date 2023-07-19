@@ -95,6 +95,9 @@ export const organizationsSlice = createSlice({
                 ...existOrg,
                 ...action.payload
             }
+        },
+        clearError: (state) => {
+            state.error = null;
         }
     },
     extraReducers(builder) {
@@ -153,6 +156,6 @@ export const organizationsSlice = createSlice({
     }
 })
 
-export const {setCategory, setStatus, setCreateOrgStatus, deleteOrg, updateOrg} = organizationsSlice.actions;
+export const {setCategory, setStatus, setCreateOrgStatus, deleteOrg, updateOrg, clearError} = organizationsSlice.actions;
 
 export default organizationsSlice.reducer

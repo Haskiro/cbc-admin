@@ -1,7 +1,7 @@
 import {FC, useCallback, useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../store/types.ts";
 import {withTimeout} from "../utils/withTimeout.ts";
-import {blockCard, getUsers, setBlockCardStatus, setStatus} from "../store/slices/usersSlice.ts";
+import {blockCard, clearError, getUsers, setBlockCardStatus, setStatus} from "../store/slices/usersSlice.ts";
 import {dateFormatter} from "../utils/dateFormatter.ts";
 import UserForm from "../modules/main/components/forms/UserForm.tsx";
 import {LoyaltyCard} from "../types/user.type.ts";
@@ -35,17 +35,13 @@ const Users: FC = () => {
     }, [createUpdateUserStatus])
 
     useEffect(() => {
-        activateNotification(!!error);
-    }, [error])
-
-    useEffect(() => {
         dispatch(setStatus("loading"));
         withTimeout(() => dispatch(getUsers()))
     }, [])
 
 
     const handleBlockCard = async (card: LoyaltyCard) => {
-        console.log("Block card")
+        dispatch(clearError());
         dispatch(setBlockCardStatus("loading"));
         dispatch(blockCard(card));
         withTimeout(() => dispatch(blockCard(card)));

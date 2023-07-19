@@ -5,7 +5,12 @@ import {Library} from "@googlemaps/js-api-loader";
 import {useAppDispatch, useAppSelector} from "../../../../store/types.ts";
 import {Organization, OrganizationNew} from "../../../../types/organization.type.ts";
 import {withTimeout} from "../../../../utils/withTimeout.ts";
-import {createOrganization, editOrganization, setCreateOrgStatus} from "../../../../store/slices/organizationsSlice.ts";
+import {
+    clearError,
+    createOrganization,
+    editOrganization,
+    setCreateOrgStatus
+} from "../../../../store/slices/organizationsSlice.ts";
 import PlacesAutocomplete from "../places-autocomplete/PlacesAutocomplete.tsx";
 import Modal from "../../../../components/modal/Modal.tsx";
 
@@ -51,6 +56,7 @@ const OrganizationForm: FC<OrganizationFormProps> = React.memo(({onClose, isActi
         } : null);
 
         const onSubmit: SubmitHandler<OrganizationNew> = async (data) => {
+            dispatch(clearError());
             dispatch(setCreateOrgStatus("loading"))
             withTimeout(async () => {
                 try {

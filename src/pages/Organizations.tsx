@@ -1,7 +1,13 @@
 import {FC, useCallback, useEffect, useState} from "react";
 import {Organization} from "../types/organization.type.ts";
 import Modal from "../components/modal/Modal.tsx";
-import {deleteOrg, deleteOrganization, getOrganizations, setStatus} from "../store/slices/organizationsSlice.ts";
+import {
+    clearError,
+    deleteOrg,
+    deleteOrganization,
+    getOrganizations,
+    setStatus
+} from "../store/slices/organizationsSlice.ts";
 import {useAppDispatch, useAppSelector} from "../store/types.ts";
 import {ellipsisLongText} from "../utils/ellipsisLongText.ts";
 import {withTimeout} from "../utils/withTimeout.ts";
@@ -37,16 +43,13 @@ const Organizations: FC = () => {
         activateNotification(createUpdateOrganizationStatus === "succeeded")
     }, [createUpdateOrganizationStatus])
 
-    useEffect(() => {
-        activateNotification(!!error);
-    }, [error])
-
     const closeModal = useCallback(() => {
         setOrganizationToEdit(null);
         setIsModalOpen(false)
     }, [])
 
     const handleDeleteOrg = async (id: string) => {
+        dispatch(clearError());
         await dispatch(deleteOrganization(id));
     }
 

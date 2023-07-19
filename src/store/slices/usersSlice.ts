@@ -96,6 +96,9 @@ export const usersSlice = createSlice({
         blockCardLocally: (state, action: PayloadAction<{ userId: string }>) => {
             const existsUser = state.users.find(el => el.id === action.payload.userId);
             existsUser!.loyaltyCard!.isBlocked = true;
+        },
+        clearError: (state) => {
+            state.error = null;
         }
     },
     extraReducers(builder) {
@@ -148,7 +151,8 @@ export const {
     editUserInfo,
     setCreateUpdateUserStatus,
     blockCardLocally,
-    setBlockCardStatus
+    setBlockCardStatus,
+    clearError
 } = usersSlice.actions;
 
 export default usersSlice.reducer

@@ -3,7 +3,7 @@ import {SubmitHandler, useForm} from "react-hook-form";
 import {useAppDispatch, useAppSelector} from "../../../../store/types.ts";
 import Modal from "../../../../components/modal/Modal.tsx";
 import {User} from "../../../../types/user.type.ts";
-import {createClient, editUser, setCreateUpdateUserStatus} from "../../../../store/slices/usersSlice.ts";
+import {clearError, createClient, editUser, setCreateUpdateUserStatus} from "../../../../store/slices/usersSlice.ts";
 import {withTimeout} from "../../../../utils/withTimeout.ts";
 import ChangePasswordForm from "./ChangePasswordForm.tsx";
 
@@ -33,6 +33,7 @@ const UserForm: FC<UserFormProps> = React.memo(({onClose, isActive, formData}) =
         const dispatch = useAppDispatch();
 
         const onSubmit: SubmitHandler<User> = async (data) => {
+            dispatch(clearError());
             dispatch(setCreateUpdateUserStatus("loading"))
             withTimeout(async () => {
                 try {
