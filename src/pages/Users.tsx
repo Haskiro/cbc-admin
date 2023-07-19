@@ -75,7 +75,7 @@ const Users: FC = () => {
                                 {user.loyaltyCard && !user.loyaltyCard.isBlocked ?
                                     <div className="flex justify-center gap-2 mt-3 w-full">
                                         <button className='bg-red-500 rounded-[12px] py-2 px-4 disabled:opacity-75'
-                                                onClick={() => handleBlockCard(user.loyaltyCard)}
+                                                onClick={() => handleBlockCard(user.loyaltyCard as LoyaltyCard)}
                                             disabled={blockCardStatus === "loading"}
                                         ><p
                                             className='h1-16-400'>{blockCardStatus === "loading" ? "Блокирование" : "Заблокировать карту"}</p></button>

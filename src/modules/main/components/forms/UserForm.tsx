@@ -5,6 +5,7 @@ import Modal from "../../../../components/modal/Modal.tsx";
 import {User} from "../../../../types/user.type.ts";
 import {createClient, editUser, setCreateUpdateUserStatus} from "../../../../store/slices/usersSlice.ts";
 import {withTimeout} from "../../../../utils/withTimeout.ts";
+import ChangePasswordForm from "./ChangePasswordForm.tsx";
 
 export type UserFormProps = {
     onClose: () => void,
@@ -98,6 +99,7 @@ const UserForm: FC<UserFormProps> = React.memo(({onClose, isActive, formData}) =
                             className='w-full bg-[#123094] hover:bg-[#121094] rounded-md text-white py-2 mt-4 disabled: opacity-75'>{createUpdateUserStatus === "loading" ? "Сохранение..." : "Сохранить"}
                     </button>
                 </form>
+                {formData ? <ChangePasswordForm onClose={onClose} /> : null}
             </Modal>
         );
     })
