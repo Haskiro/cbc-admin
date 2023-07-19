@@ -13,6 +13,7 @@ import {
 } from "../../../../store/slices/organizationsSlice.ts";
 import PlacesAutocomplete from "../places-autocomplete/PlacesAutocomplete.tsx";
 import Modal from "../../../../components/modal/Modal.tsx";
+import OfferForm from "./OfferForm.tsx";
 
 export type OrganizationFormProps = {
     onClose: () => void,
@@ -151,6 +152,7 @@ const OrganizationForm: FC<OrganizationFormProps> = React.memo(({onClose, isActi
                                     className='w-full bg-[#123094] hover:bg-[#121094] rounded-md text-white py-2 mt-4 disabled: opacity-75'>{createUpdateOrganizationStatus === "loading" ? "Сохранение..." : "Сохранить"}
                             </button>
                         </form>
+                        {formData ? <OfferForm onClose={onClose} organizationId={formData.id} /> : null}
                     </Modal>
                 }</>
         );

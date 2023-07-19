@@ -3,18 +3,19 @@ import api from "../../api"
 import {Organization, OrganizationNew} from "../../types/organization.type.ts";
 import {Status} from "../../types/status.type.ts";
 import {createAppAsyncThunk} from "../types.ts";
-import {isAxiosError} from "axios";
-import {resetToken} from "./authSlice.ts";
+
 
 export interface OrganizationsState {
     organizations: Organization[];
     status: Status;
     createUpdateOrganizationStatus: Status;
     deleteOrgStatus: Status;
+    fetchOrganizationInfoStatus: Status;
     error: string | null,
     categories: string[],
     categoriesStatus: Status,
     currentCategory: string,
+    editingOrganization: Organization | null
 }
 
 const initialState: OrganizationsState = {
@@ -22,10 +23,12 @@ const initialState: OrganizationsState = {
     status: "idle",
     createUpdateOrganizationStatus: "idle",
     deleteOrgStatus: "idle",
+    fetchOrganizationInfoStatus: "idle",
     error: null,
     categories: [],
     categoriesStatus: "idle",
-    currentCategory: "Все"
+    currentCategory: "Все",
+    editingOrganization: null
 }
 
 export const getOrganizations = createAppAsyncThunk(
@@ -52,7 +55,7 @@ export const createOrganization = createAppAsyncThunk(
 
 export const deleteOrganization = createAppAsyncThunk(
     "organizations/deleteOrganization",
-    async (id: string, {dispatch, rejectWithValue}) => {
+    async (id: string, {dispatch}) => {
         const response = await api.organizations.deleteOrganization(id);
         if (response.ok) {
             dispatch(deleteOrg(id));
@@ -64,11 +67,19 @@ export const editOrganization = createAppAsyncThunk(
     "organizations/editOrganization",
     async (org: Partial<Omit<OrganizationNew, "icon"> & {
         icon: File;
-    }>, {dispatch, rejectWithValue}) => {
+    }>, {dispatch}) => {
         const response = await api.organizations.editOrganization(org);
         if (response.ok) {
             dispatch(getOrganizations());
         }
+    }
+);
+
+export const getOrganizationInfo = createAppAsyncThunk(
+    "organizations/getOrganizationInfo",
+    async (id: string, {dispatch}) => {
+        const response = await api.organizations.getOrganizationById(id);
+        return response;
     }
 );
 
@@ -98,7 +109,10 @@ export const organizationsSlice = createSlice({
         },
         clearError: (state) => {
             state.error = null;
-        }
+        },
+        setFetchOrganizationInfoStatus: (state, action: PayloadAction<Status>) => {
+            state.fetchOrganizationInfoStatus = action.payload;
+        },
     },
     extraReducers(builder) {
         builder
@@ -153,9 +167,28 @@ export const organizationsSlice = createSlice({
                 state.createUpdateOrganizationStatus = "failed";
                 state.error = action.error.message || null;
             })
+            .addCase(
+                getOrganizationInfo.fulfilled,
+                (state, action: PayloadAction<Organization>) => {
+                    state.editingOrganization = action.payload;
+                    state.fetchOrganizationInfoStatus = "succeeded";
+                }
+            )
+            .addCase(getOrganizationInfo.rejected, (state, action) => {
+                state.fetchOrganizationInfoStatus = "failed";
+                state.error = action.error.message || null;
+            })
     }
 })
 
-export const {setCategory, setStatus, setCreateOrgStatus, deleteOrg, updateOrg, clearError} = organizationsSlice.actions;
+export const {
+    setCategory,
+    setStatus,
+    setCreateOrgStatus,
+    deleteOrg,
+    updateOrg,
+    clearError,
+    setFetchOrganizationInfoStatus
+} = organizationsSlice.actions;
 
 export default organizationsSlice.reducer
