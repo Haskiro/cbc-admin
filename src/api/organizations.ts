@@ -1,6 +1,7 @@
 import {AxiosResponse} from "axios";
 import {HTTP} from "./index";
 import {Organization, OrganizationNew} from "../types/organization.type";
+import {Offer} from "../types/offer.type.ts";
 
 const getList = async (category: string): Promise<Organization[]> => {
     const query = category !== "Все" ? new URLSearchParams({category}).toString() : "";
@@ -44,6 +45,16 @@ const deleteOrganization = async (id: string): Promise<{ ok: boolean }> => {
     return res.data;
 }
 
+const createOffer = async (newOffer: Partial<Offer>): Promise<{ok?: boolean, message?: string}> => {
+    const res: AxiosResponse<{ok?: boolean, message?: string}> = await HTTP.post("/offers/create", newOffer);
+    return res.data;
+}
+
+const deleteOffer = async (id: string): Promise<{ok?: boolean, message?: string}> => {
+    const res: AxiosResponse<{ok?: boolean, message?: string}> = await HTTP.delete("/offers/delete", {data: {id}});
+    return res.data;
+}
+
 
 export default {
     getList,
@@ -51,5 +62,7 @@ export default {
     getOrganizationById,
     createOrganization,
     deleteOrganization,
-    editOrganization
+    editOrganization,
+    createOffer,
+    deleteOffer
 }

@@ -3,6 +3,8 @@ import api from "../../api"
 import {Organization, OrganizationNew} from "../../types/organization.type.ts";
 import {Status} from "../../types/status.type.ts";
 import {createAppAsyncThunk} from "../types.ts";
+import {Offer} from "../../types/offer.type.ts";
+import {withTimeout} from "../../utils/withTimeout.ts";
 
 
 export interface OrganizationsState {
@@ -80,6 +82,19 @@ export const getOrganizationInfo = createAppAsyncThunk(
     async (id: string, {dispatch}) => {
         const response = await api.organizations.getOrganizationById(id);
         return response;
+    }
+);
+
+export const createOffer = createAppAsyncThunk(
+    "organizations/createOffer",
+    async (offer: Partial<Offer>,
+           {dispatch}) => {
+        const response = await api.organizations.createOffer(offer);
+        if (response.ok) {
+            dispatch(setFetchOrganizationInfoStatus("loading"));
+            withTimeout(() => getOrganizationInfo(offer.organizationId as string));
+        }
+        return response
     }
 );
 
