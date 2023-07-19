@@ -2,20 +2,24 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 import api from "../../api"
 import {Status} from "../../types/status.type.ts";
 import {createAppAsyncThunk} from "../types.ts";
-import {User} from "../../types/user.type.ts";
-import {deleteOrg} from "./organizationsSlice.ts";
+import {User, UserCreate} from "../../types/user.type.ts";
 import {getUserInfo} from "./authSlice.ts";
+import {withTimeout} from "../../utils/withTimeout.ts";
+import {setStatus as setAuthStatus} from "./authSlice.ts";
+import {createOrganization} from "./organizationsSlice.ts";
 
 export interface UsersState {
     users: User[];
     status: Status;
     createUpdateUserStatus: Status;
+    error: string | null;
 }
 
 const initialState: UsersState = {
     users: [],
     status: "idle",
-    createUpdateUserStatus: "idle"
+    createUpdateUserStatus: "idle",
+    error: null
 }
 
 export type EditUserParams = {
@@ -36,10 +40,27 @@ export const editUser = createAppAsyncThunk(
     async ({newUserData, id}: EditUserParams, {dispatch, rejectWithValue}) =>  {
         const response = await api.users.editUser(newUserData);
         if (response.ok) {
+            dispatch(setStatus("loading"));
+            dispatch(setAuthStatus("loading"));
+            withTimeout(() => {
                 dispatch(getUserInfo());
                 dispatch(editUserInfo({id, newUserData}))
+            });
         } else {
             rejectWithValue("Ошибка изменения данных пользователя");
+        }
+    }
+)
+
+export const createClient  = createAppAsyncThunk(
+    "users/createClient",
+    async (newUser: UserCreate, {dispatch, rejectWithValue}) =>  {
+        const response = await api.users.createClient(newUser);
+        if (response.id) {
+            dispatch(setStatus("loading"));
+            withTimeout(() => dispatch(getUsers()));
+        } else {
+            rejectWithValue("Ошибка создания пользователя");
         }
     }
 )
@@ -80,8 +101,19 @@ export const usersSlice = createSlice({
                     state.createUpdateUserStatus = "succeeded";
                 }
             )
-            .addCase(editUser.rejected, (state) => {
+            .addCase(editUser.rejected, (state, action) => {
                 state.createUpdateUserStatus = "failed";
+                state.error = action.payload || null;
+            })
+            .addCase(
+                createClient.fulfilled,
+                (state) => {
+                    state.createUpdateUserStatus = "succeeded";
+                }
+            )
+            .addCase(createClient.rejected, (state, action) => {
+                state.createUpdateUserStatus = "failed";
+                state.error = action.payload || null;
             })
     }
 })

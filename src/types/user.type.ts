@@ -19,3 +19,5 @@ export type LoyaltyCard = {
     updatedAt: string,
     accountId: string
 }
+
+export type UserCreate = Pick<User, "firstName" | "lastName">;

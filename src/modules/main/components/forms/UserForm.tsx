@@ -3,7 +3,7 @@ import {SubmitHandler, useForm} from "react-hook-form";
 import {useAppDispatch, useAppSelector} from "../../../../store/types.ts";
 import Modal from "../../../../components/modal/Modal.tsx";
 import {User} from "../../../../types/user.type.ts";
-import {editUser, setCreateUpdateUserStatus} from "../../../../store/slices/usersSlice.ts";
+import {createClient, editUser, setCreateUpdateUserStatus} from "../../../../store/slices/usersSlice.ts";
 import {withTimeout} from "../../../../utils/withTimeout.ts";
 
 export type UserFormProps = {
@@ -36,7 +36,7 @@ const UserForm: FC<UserFormProps> = React.memo(({onClose, isActive, formData}) =
             withTimeout(async () => {
                 try {
                     if (!formData) {
-                        console.log(data);
+                        await dispatch(createClient(data)).unwrap();
                     } else {
                         await dispatch(editUser({id: formData.id, newUserData: data})).unwrap();
                     }
@@ -78,7 +78,7 @@ const UserForm: FC<UserFormProps> = React.memo(({onClose, isActive, formData}) =
                     />
                     {errors?.lastName && (
                         <div className="h1-11-400 !text-[#FE0826]">{errors.lastName.message}</div>
-                    )}<label>Почта</label>
+                    )}{formData ? <><label>Почта</label>
                     <input
                         type="text"
                         className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-[#123094]'
@@ -92,7 +92,7 @@ const UserForm: FC<UserFormProps> = React.memo(({onClose, isActive, formData}) =
                     />
                     {errors?.email && (
                         <div className="h1-11-400 !text-[#FE0826]">{errors.email.message}</div>
-                    )}
+                    )}</> : null}
                     <button type="submit"
                             disabled={createUpdateUserStatus === "loading"}
                             className='w-full bg-[#123094] hover:bg-[#121094] rounded-md text-white py-2 mt-4 disabled: opacity-75'>{createUpdateUserStatus === "loading" ? "Сохранение..." : "Сохранить"}

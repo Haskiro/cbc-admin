@@ -1,14 +1,9 @@
 import {FC, useCallback, useEffect, useState} from "react";
-import {Organization} from "../types/organization.type.ts";
-import Modal from "../components/modal/Modal.tsx";
 import {useAppDispatch, useAppSelector} from "../store/types.ts";
-import {ellipsisLongText} from "../utils/ellipsisLongText.ts";
 import {withTimeout} from "../utils/withTimeout.ts";
 import {getUsers, setStatus} from "../store/slices/usersSlice.ts";
 import {dateFormatter} from "../utils/dateFormatter.ts";
 import UserForm from "../modules/main/components/forms/UserForm.tsx";
-import {User} from "../types/user.type.ts";
-import {deleteOrganization} from "../store/slices/organizationsSlice.ts";
 
 const Users: FC = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -57,7 +52,7 @@ const Users: FC = () => {
                                 <div className="flex flex-col gap-1 text-[#123094] font-semibold text-[16px]">
                                     <p>Имя: {user.firstName}</p>
                                     <p>Фамилия: {user.lastName}</p>
-                                    {user.email !== "user@fund.ru" ?
+                                    {user.email && user.email !== "user@fund.ru" ?
                                         <p>Почта: {user.email}</p> : null}
                                     <p>Дата
                                         регистрации: {dateFormatter(new Date(user.createdAt))}</p>
