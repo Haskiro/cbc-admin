@@ -13,6 +13,7 @@ export interface OrganizationsState {
     createUpdateOrganizationStatus: Status;
     deleteOrgStatus: Status;
     fetchOrganizationInfoStatus: Status;
+    offerStatus: Status;
     error: string | null,
     categories: string[],
     categoriesStatus: Status,
@@ -26,6 +27,7 @@ const initialState: OrganizationsState = {
     createUpdateOrganizationStatus: "idle",
     deleteOrgStatus: "idle",
     fetchOrganizationInfoStatus: "idle",
+    offerStatus: "idle",
     error: null,
     categories: [],
     categoriesStatus: "idle",
@@ -90,9 +92,22 @@ export const createOffer = createAppAsyncThunk(
     async (offer: Partial<Offer>,
            {dispatch}) => {
         const response = await api.organizations.createOffer(offer);
+        if (response.text) {
+            dispatch(setFetchOrganizationInfoStatus("loading"));
+            withTimeout(() => dispatch(getOrganizationInfo(offer.organizationId as string)));
+        }
+        return response
+    }
+);
+
+export const deleteOffer = createAppAsyncThunk(
+    "organizations/deleteOffer",
+    async (offer: Offer,
+           {dispatch}) => {
+        const response = await api.organizations.deleteOffer(offer.id);
         if (response.ok) {
             dispatch(setFetchOrganizationInfoStatus("loading"));
-            withTimeout(() => getOrganizationInfo(offer.organizationId as string));
+            withTimeout(() => dispatch(getOrganizationInfo(offer.organizationId as string)));
         }
         return response
     }
@@ -127,6 +142,12 @@ export const organizationsSlice = createSlice({
         },
         setFetchOrganizationInfoStatus: (state, action: PayloadAction<Status>) => {
             state.fetchOrganizationInfoStatus = action.payload;
+        },
+        setOfferStatus: (state, action: PayloadAction<Status>) => {
+            state.offerStatus = action.payload;
+        },
+        setDeleteOrgStatus: (state, action: PayloadAction<Status>) => {
+            state.deleteOrgStatus = action.payload;
         },
     },
     extraReducers(builder) {
@@ -193,6 +214,26 @@ export const organizationsSlice = createSlice({
                 state.fetchOrganizationInfoStatus = "failed";
                 state.error = action.error.message || null;
             })
+            .addCase(
+                createOffer.fulfilled,
+                (state) => {
+                    state.offerStatus = "succeeded";
+                }
+            )
+            .addCase(createOffer.rejected, (state, action) => {
+                state.offerStatus = "failed";
+                state.error = action.error.message || null;
+            })
+            .addCase(
+                deleteOffer.fulfilled,
+                (state) => {
+                    state.offerStatus = "succeeded";
+                }
+            )
+            .addCase(deleteOffer.rejected, (state, action) => {
+                state.offerStatus = "failed";
+                state.error = action.error.message || null;
+            })
     }
 })
 
@@ -203,7 +244,9 @@ export const {
     deleteOrg,
     updateOrg,
     clearError,
-    setFetchOrganizationInfoStatus
+    setFetchOrganizationInfoStatus,
+    setOfferStatus,
+    setDeleteOrgStatus
 } = organizationsSlice.actions;
 
 export default organizationsSlice.reducer

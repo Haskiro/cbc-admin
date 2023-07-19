@@ -1,7 +1,14 @@
 import {FC, useCallback, useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../store/types.ts";
 import {withTimeout} from "../utils/withTimeout.ts";
-import {blockCard, clearError, getUsers, setBlockCardStatus, setStatus} from "../store/slices/usersSlice.ts";
+import {
+    blockCard,
+    clearError,
+    getUsers,
+    setBlockCardStatus,
+    setCreateUpdateUserStatus,
+    setStatus
+} from "../store/slices/usersSlice.ts";
 import {dateFormatter} from "../utils/dateFormatter.ts";
 import UserForm from "../modules/main/components/forms/UserForm.tsx";
 import {LoyaltyCard} from "../types/user.type.ts";
@@ -35,6 +42,9 @@ const Users: FC = () => {
     }, [createUpdateUserStatus])
 
     useEffect(() => {
+        setIsNotificationActive(false)
+        dispatch(setBlockCardStatus("idle"));
+        dispatch(setCreateUpdateUserStatus("idle"));
         dispatch(setStatus("loading"));
         withTimeout(() => dispatch(getUsers()))
     }, [])

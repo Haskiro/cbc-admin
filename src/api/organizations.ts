@@ -45,8 +45,8 @@ const deleteOrganization = async (id: string): Promise<{ ok: boolean }> => {
     return res.data;
 }
 
-const createOffer = async (newOffer: Partial<Offer>): Promise<{ok?: boolean, message?: string}> => {
-    const res: AxiosResponse<{ok?: boolean, message?: string}> = await HTTP.post("/offers/create", newOffer);
+const createOffer = async (newOffer: Partial<Offer>): Promise<Partial<Offer>> => {
+    const res: AxiosResponse<Partial<Offer>> = await HTTP.post("/offers/create", newOffer);
     return res.data;
 }
 

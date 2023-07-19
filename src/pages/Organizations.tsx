@@ -1,11 +1,9 @@
 import {FC, useCallback, useEffect, useState} from "react";
 import {Organization} from "../types/organization.type.ts";
-import Modal from "../components/modal/Modal.tsx";
 import {
     clearError,
-    deleteOrg,
     deleteOrganization,
-    getOrganizations,
+    getOrganizations, setCreateOrgStatus, setDeleteOrgStatus, setOfferStatus,
     setStatus
 } from "../store/slices/organizationsSlice.ts";
 import {useAppDispatch, useAppSelector} from "../store/types.ts";
@@ -22,6 +20,7 @@ const Organizations: FC = () => {
     const error = useAppSelector((state) => state.organizations.error);
     const currentCategory = useAppSelector(state => state.organizations.currentCategory);
     const deleteOrgStatus = useAppSelector((state) => state.organizations.deleteOrgStatus);
+    const offerStatus = useAppSelector((state) => state.organizations.offerStatus);
     const createUpdateOrganizationStatus = useAppSelector((state) => state.organizations.createUpdateOrganizationStatus);
     const [organizationToEdit, setOrganizationToEdit] = useState<Organization | null>(null);
     const [isNotificationActive, setIsNotificationActive] = useState<boolean>(false);
@@ -38,6 +37,10 @@ const Organizations: FC = () => {
     useEffect(() => {
         activateNotification(deleteOrgStatus === "succeeded")
     }, [deleteOrgStatus])
+
+    useEffect(() => {
+        activateNotification(offerStatus === "succeeded")
+    }, [offerStatus])
 
     useEffect(() => {
         activateNotification(createUpdateOrganizationStatus === "succeeded")
@@ -59,8 +62,14 @@ const Organizations: FC = () => {
     }
 
     useEffect(() => {
+        dispatch(clearError());
+        dispatch(setOfferStatus("idle"))
+        dispatch(setCreateOrgStatus("idle"))
+        dispatch(setDeleteOrgStatus("idle"))
         dispatch(setStatus("loading"));
+        setIsNotificationActive(false)
         withTimeout(() => dispatch(getOrganizations()))
+
     }, [currentCategory])
 
     return (

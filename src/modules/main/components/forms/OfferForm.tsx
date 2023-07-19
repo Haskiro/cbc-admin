@@ -4,9 +4,9 @@ import {useAppDispatch, useAppSelector} from "../../../../store/types.ts";
 import {withTimeout} from "../../../../utils/withTimeout.ts";
 import {Offer} from "../../../../types/offer.type.ts";
 import {
-    clearError, editOrganization,
+    clearError, createOffer, deleteOffer, editOrganization,
     getOrganizationInfo,
-    setFetchOrganizationInfoStatus
+    setFetchOrganizationInfoStatus, setOfferStatus
 } from "../../../../store/slices/organizationsSlice.ts";
 
 
@@ -18,6 +18,7 @@ export type OfferForm = {
 const OfferForm: FC<OfferForm> = React.memo(({onClose, organizationId}) => {
         const {register, handleSubmit, formState: {errors}, setValue, reset} = useForm<Partial<Offer>>();
         const fetchOrganizationInfoStatus = useAppSelector((state) => state.organizations.fetchOrganizationInfoStatus);
+        const offerStatus = useAppSelector((state) => state.organizations.offerStatus);
         const editingOrganization = useAppSelector((state) => state.organizations.editingOrganization);
         const dispatch = useAppDispatch();
 
@@ -30,6 +31,14 @@ const OfferForm: FC<OfferForm> = React.memo(({onClose, organizationId}) => {
             reset();
         }, [])
 
+        const handleDeleteOffer = (offer: Offer) => {
+            dispatch(clearError());
+            dispatch(setOfferStatus("loading"))
+            withTimeout(() => {
+                dispatch(deleteOffer(offer));
+            })
+        }
+
         const onSubmit: SubmitHandler<Partial<Offer>> = async (data) => {
             dispatch(clearError());
             withTimeout(async () => {
@@ -38,7 +47,12 @@ const OfferForm: FC<OfferForm> = React.memo(({onClose, organizationId}) => {
                         ...data,
                         organizationId: organizationId
                     });
-                    // await dispatch(changePassword(data));
+                    dispatch(clearError());
+                    dispatch(setOfferStatus("loading"))
+                    await dispatch(createOffer({
+                        ...data,
+                        organizationId: organizationId
+                    }));
                     reset();
                 } catch (e) {
                     return e;
@@ -56,8 +70,9 @@ const OfferForm: FC<OfferForm> = React.memo(({onClose, organizationId}) => {
                     <ul>
                         {editingOrganization.offers.map((offer) => <li className="flex gap-3" key={offer.id}>
                             <p className="rounded-md p-1 text-black border border-[#123094]">{offer.text}</p>
-                            <button onClick={() => console.log("delete offer: ", offer.id)}
-                                    className="text-red-500 text-[15px] hover:underline">Удалить
+                            <button onClick={() => handleDeleteOffer(offer)}
+                                    disabled={offerStatus === "loading"}
+                                    className="text-red-500 text-[15px] hover:underline  disabled:opacity-75">Удалить
                             </button>
                         </li>)}
                     </ul> : null}
@@ -76,8 +91,8 @@ const OfferForm: FC<OfferForm> = React.memo(({onClose, organizationId}) => {
                     <div className="h1-11-400 !text-[#FE0826]">{errors.text.message}</div>
                 )}
                 <button type="submit"
-                        disabled={fetchOrganizationInfoStatus === "loading"}
-                        className='w-full bg-[#123094] hover:bg-[#121094] rounded-md text-white py-2 mt-4 disabled: opacity-75'>{fetchOrganizationInfoStatus === "loading" ? "Сохранение..." : "Добавить"}
+                        disabled={offerStatus === "loading"}
+                        className='w-full bg-[#123094] hover:bg-[#121094] rounded-md text-white py-2 mt-4 disabled:opacity-75'>{offerStatus === "loading" ? "Сохранение..." : "Добавить"}
                 </button>
             </form>
         );

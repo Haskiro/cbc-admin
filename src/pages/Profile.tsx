@@ -32,6 +32,7 @@ const Profile: FC = () => {
         dispatch(clearError());
         dispatch(setCreateUpdateUserStatus("idle"));
         dispatch(setChangePasswordStatus("idle"));
+        setIsNotificationActive(false)
         dispatch(setStatus("loading"));
         withTimeout(() => dispatch(getUserInfo()));
     }, [])
