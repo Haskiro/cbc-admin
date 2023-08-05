@@ -49,8 +49,9 @@ export const getOrganizations = createAppAsyncThunk(
 
 export const createOrganization = createAppAsyncThunk(
     "organizations/createOrganization",
-    async (newOrg: Omit<OrganizationNew, "icon"> & {
+    async (newOrg: Omit<OrganizationNew, "icon" | "specialCardImage"> & {
         icon: File;
+        specialCardImage: File | null
     }) => {
         const response = await api.organizations.createOrganization(newOrg);
         return response;

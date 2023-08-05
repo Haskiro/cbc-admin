@@ -65,6 +65,7 @@ const OrganizationForm: FC<OrganizationFormProps> = React.memo(({onClose, isActi
                         await dispatch(createOrganization({
                             ...data,
                             icon: data.icon![0],
+                            specialCardImage: data.specialCardImage ? data.specialCardImage[0] : null,
                             ...address
                         })).unwrap()
                     } else {
@@ -128,6 +129,15 @@ const OrganizationForm: FC<OrganizationFormProps> = React.memo(({onClose, isActi
                                 {errors?.icon && (
                                     <div className="h1-11-400 !text-[#FE0826]">{errors.icon.message}</div>
                                 )}</>}
+                            {!formData && <><label>Скидочная карта</label>
+                                <input
+                                    type="file"
+                                    className='w-full rounded-md focus:border-black focus:outline-none px-2 text-black py-2 border border-[#123094]'
+                                    {...register('specialCardImage')}
+                                />
+                                {errors?.specialCardImage && (
+                                    <div className="h1-11-400 !text-[#FE0826]">{errors.specialCardImage.message}</div>
+                                )}</>}
                             <PlacesAutocomplete register={register}
                                                 onSelected={(location: Location) => setAddress(location)}
                                                 setFieldValue={setValue}
@@ -152,7 +162,7 @@ const OrganizationForm: FC<OrganizationFormProps> = React.memo(({onClose, isActi
                                     className='w-full bg-[#123094] hover:bg-[#121094] rounded-md text-white py-2 mt-4 disabled:opacity-75'>{createUpdateOrganizationStatus === "loading" ? "Сохранение..." : "Сохранить"}
                             </button>
                         </form>
-                        {formData ? <OfferForm onClose={onClose} organizationId={formData.id} /> : null}
+                        {formData ? <OfferForm onClose={onClose} organizationId={formData.id}/> : null}
                     </Modal>
                 }</>
         );

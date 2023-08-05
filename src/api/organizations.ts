@@ -22,8 +22,9 @@ const getOrganizationById = async (id: string): Promise<Organization> => {
     return res.data;
 }
 
-const createOrganization = async (newOrg: Omit<OrganizationNew, "icon"> & {
+const createOrganization = async (newOrg: Omit<OrganizationNew, "icon" | "specialCardImage"> & {
     icon: File;
+    specialCardImage: File | null
 }): Promise<Organization> => {
     const res: AxiosResponse<Organization> = await HTTP.post("/organizations/create", newOrg, {
         headers: {

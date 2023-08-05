@@ -100,18 +100,21 @@ const Organizations: FC = () => {
                         organizations.map((organization: Organization) =>
                             <div className='h-[450px] w-[350px] border-1 border-gray-600 border rounded-md mb-4 p-2 flex-col justify-between items-start flex'
                                  key={organization.id}>
-                                <div className='min-h-[150px] w-full mb-4 bg-no-repeat bg-cover rounded-md'
+                                <div className='min-h-[150px] w-full mb-2 bg-no-repeat bg-cover rounded-md'
                                      style={{backgroundImage: `url(${organization.icon})`}}>
                                 </div>
-                                <h1 className='h1-22-400 !text-blue-400 mb-4 w-full break-words max-w-[20ch] overflow-ellipsis'
+                                <h1 className='h1-22-400 !text-blue-400 mb-2 w-full break-words max-w-[20ch] overflow-ellipsis'
                                     title={organization.title}>{organization.title}</h1>
-                                <p className='text-[18px] h1-18-400 mb-4 w-full'
+                                <p className='text-[18px] h1-18-400 mb-1 w-full'
                                    title={organization.description}>{ellipsisLongText(
                                     organization.description,
-                                    90
+                                    55
                                 )}</p>
-                                <p className='text-[16px] h1-16-400 mb-4 w-full'
+                                <p className='text-[16px] h1-16-400 mb-1 w-full'
                                    title={organization.address}>{ellipsisLongText(organization.address, 40)}</p>
+                                {organization.specialCardImageUrl ?
+                                    <a href={import.meta.env.VITE_API_URL + "/" + organization.specialCardImageUrl} target="_blank" className='text-[18px] !text-blue-600 underline h1-18-400 mb-1 w-full'
+                                    >Скидочная карта</a> : null}
                                 <div className="flex justify-center gap-2 mt-3 w-full">
                                     <button className='bg-[#123094] hover:bg-[#121094] rounded-[12px] py-2 px-4 disabled:opacity-75'
                                             onClick={() => handleEditOrganization(organization)}><p
